@@ -1,0 +1,499 @@
+\chapter{Обращение Мёбиуса, свертка Дирихле}\label{Mobius}
+
+% TODO: упростить доказательства
+
+Рассмотрим различные свертки функций. Функции мы будем рассматривать арифметические, то есть действующие из $\N$ в $\N$, $\Z$, $\R$ или $\mathbb{C}$.
+В каком-то смысле можно думать про арифметические функции как про последовательности чисел:
+$f(1), f(2), \ldots, f(n), \ldots$.
+
+Возможно, вам уже знакомы некоторые свертки. К примеру, свертка умножения:
+
+$$c_n = \sum \limits_{k = 0}^{n} a_k \cdot b_{n - k} \text{\graytext{/ здесь последовательности нумеруются с нуля/}}$$
+
+Быстрое преобразование Фурье как раз строит по последовательностям $a$ и $b$ их свертку умножения.
+
+В этом разделе мы рассмотрим несколько примеров других сверток.
+
+\section{Формула обращения Мёбиуса}
+
+Часто бывает так, что две функции связаны между собой следующим отношением:
+
+$$g(n) = \sum \limits_{d | n} f(d)$$
+
+\graytext{/ Запись $d | n$ означает ``$d$ делит $n$'', то есть сумма берется по всем делителям числа $n$ /}
+
+\begin{definition}
+    Функция Мёбиуса.
+
+    $$\mu(n) = \begin{cases}
+        0, \text{ если $n$ не свободно от квадратов,} \\
+        (-1)^k, \text{ если $n$ свободно от квадратов, и у него ровно $k$ простых делителей}
+    \end{cases}$$
+
+    \graytext{/ Число свободно от квадратов, если все простые входят в его разложение в степени ровно один /} 
+\end{definition}
+
+\begin{example}
+\label{Mobius: chi}
+    1. Количество делителей числа: $\tau(n) = \sum \limits_{d | n} 1$.
+    
+    2. Сумма делителей числа: $\sigma(n) = \sum \limits_{d | n} d$.
+
+    3. Функция, которая равна единице в единице и нулю во всех остальных натуральных числах:
+    $\chi_1 = \sum \limits_{d | n} \mu(d)$.
+\end{example}
+
+\begin{proof}
+    3. Пусть $n = p_1^{\alpha_1} \cdot p_2^{\alpha_2} \cdot \ldots \cdot p_k^{\alpha_k}$.
+    Если $\mu(d) \neq 0$, то каждую $p$-шку мы взяли в него либо в нулевой степени, либо в первой.
+    Тогда есть $\sum \limits_{i = 0}^{\left\lfloor \frac{k}{2} \right\rfloor} {k \choose 2i}$ $d$-шек, для которых $\mu(d) = 1$
+    и $\sum \limits_{i = 0}^{\left\lfloor \frac{k-1}{2} \right\rfloor} {k \choose 2i + 1}$ $d$-шек, для которых $\mu(d) = -1$.
+    А такие суммы равны при $n > 1$ (сумма четных биномиальных коэффициентов равна сумме нечетных), так что вся сумма равна нулю.
+    При $n = 1$ легко произвести подстановку и проверить, что $\chi_1(1) = 1$.
+\end{proof}
+
+\begin{definition}
+    Функция Эйлера $\varphi(n)$~--- это количество чисел, не больших $n$, которые взаимно просты с $n$.
+\end{definition}
+
+\begin{observation}
+    Есть формула для функции Эйлера, которая имеет похожий вид:
+
+    $\varphi(n) = n \prod \limits_{p | n} (1 - \frac{1}{p})$, 
+    где произведение берется по всем простым делителям $n$.
+\end{observation}
+
+\begin{theorem} \textbf{Формула обращения Мёбиуса}
+    
+    Пусть $f$ и $g$~--- арифметические функции. Тогда
+
+    $g(n) = \sum \limits_{d | n} f(d) \Leftrightarrow f(n) = \sum \limits_{d | n} \mu(d) g \left (\frac{n}{d} \right )$.
+\end{theorem}
+
+\begin{proof}
+    $$\sum \limits_{d | n} \mu(d) g \left (\frac{n}{d} \right ) = 
+    \text{\graytext{/ по левой формуле, которая у нас уже есть /}} = $$
+
+    $$ = \sum \limits_{d | n} \mu(d)  \left (\sum \limits_{d' | \frac{n}{d}} f(d') \right ) =
+     \sum \limits_{d, d' : (d \cdot d') | n} \mu(d) \cdot f(d') = 
+     \text{\graytext{/ поменяем местами обозначения /}} = $$
+    
+     $$ = \sum \limits_{d, d' : (d \cdot d') | n} \mu(d') \cdot f(d) = 
+     \sum \limits_{d | n} f(d) \left (\sum \limits_{d' | \frac{n}{d}} \mu(d') \right ) =
+     \text{\graytext{/ по примеру 3 /}}
+    = \sum \limits_{d | n} f(d) \chi_1(\frac{n}{d}) = f(n)$$
+
+    Последнее равенство верно, потому что у всех слагаемых кроме $d = n$ будет множитель $0$.
+
+    В обратную сторону аналогично. Нужно тоже подставить.
+\end{proof}
+
+\begin{example}
+    Подставим в эту формулу примеры выше:
+
+    1. $1 = \sum \limits_{d | n} \mu(d) \tau \left ( \frac{n}{d} \right )$.
+    
+    2. $n = \sum \limits_{d | n} \mu(d) \sigma \left ( \frac{n}{d} \right )$.
+
+    3. $\mu(n) = \sum \limits_{d | n} \mu(d) \chi_1 \left ( \frac{n}{d} \right )$ (что очевидно, но показывает, что формула из третьего примера является частным случаем формулы обращения Мёбиуса).
+\end{example}
+
+\begin{example}
+    Существует такое тождество: $n = \sum \limits_{d | n} \varphi(d)$. Применим формулу обращения Мёбиуса и получим, что
+    $\varphi(n) = \sum \limits_{d | n} \mu(d) \cdot \frac{n}{d}$.
+
+    Неожиданно получили связь функций Эйлера и Мёбиуса.
+\end{example}
+
+\section{Свертка Дирихле}
+
+$\sum \limits_{d | n} \mu(d) g \left ( \frac{n}{d} \right )$ является частным случаем свертки Дирихле:
+
+\begin{definition}
+    Свертка Дирихле двух арифметических функций определяется следующим образом:
+
+    $(f * g)(n) = \sum \limits_{d | n} f(d) g \left ( \frac{n}{d} \right ) = \sum \limits_{ab = n} f(a) g(b)$.
+\end{definition}
+
+\begin{observation}
+    \label{Mobius: dirform}
+    Тогда формулу обращения Мёбиуса можно коротко записать как
+
+    $$
+    g = f * 1 \Leftrightarrow f = g * \mu
+    $$
+\end{observation}
+
+\begin{definition}
+    Арифметическая функция $f$ называется мультипликативной, если
+    $f(a \cdot b) = f(a) \cdot f(b) \ \forall \ a, b \in \N$, таких что $gcd(a, b) = 1$.
+\end{definition}
+
+\begin{observation}
+    $\mu, \varphi, \tau, \sigma, \chi_1, id, 1$~--- мультипликативные арифметические функции.
+    \graytext{/ 1~--- это фунция, равная единице во всех точках /} 
+\end{observation}
+
+\begin{properties}
+
+    1. $(f * g) * h = f * (g * h)$.
+
+    2. $f * g = g * f$.
+
+    3. $f * (g + h) = f * g + f * h$.
+
+    4. $f * \chi_1 = \chi_1 * f = f$.
+
+    5. $f * 0 = 0 * f = 0$ ($0$~--- это функция, которая всегда равна нулю).
+
+    6. Если $f$ и $g$~--- мультипликативные, то $f * g$ тоже является мультипликативной.
+\end{properties}
+
+\begin{proof}
+    1-5. Очевидно. Проверяется подстановкой.
+
+    6. $gcd(n, m)=1$, $(f*g)(n \cdot m) =  \sum \limits_{d|n \cdot m} f(d)g(\frac{n \cdot m}{d}) = $
+    \graytext{/ здесь мы пользуемся тем, что числа взаимно просты; иначе мы бы получили сумму с повторениями /} 
+    $= \sum \limits_{d_1|n, d_2|m} f(d_1 \cdot d_2) g(\frac{n \cdot m}{d_1 \cdot d_2}) =$
+    \graytext{/ а здесь тем, что числа делители взаимно простых чисел взаимно просты /} 
+    $=\sum \limits_{d_1|n, d_2|m} f(d_1) f(d_2) g(\frac{n}{d_1}) g(\frac{m}{d_2}) = $
+    $\left(\sum \limits_{d_1|n} f(d_1) g(\frac{n}{d_1})\right) \cdot \left(\sum \limits_{d_2|m} f(d_2) g(\frac{m}{d_2})\right) = (f * g)(n) \cdot (f * g)(m)$.
+\end{proof}
+
+Получили, что арифметические функции образуют коммутативное кольцо с единицей относительно свертки Дирихле и поточечного сложения.
+Нулем в этом кольце является тождественно нулевая функция, а единицей~--- функция $\chi_1$. Это кольцо называется \textbf{кольцом Дирихле}.
+
+\begin{example}
+\label{Mobius: 1mu}
+    a. $\tau = 1 * 1$.
+
+    b. $\sigma = id * 1$.
+
+    c. $\chi_1 = 1 * \mu$.
+
+    d. $1 = \tau * \mu$.
+
+    e. $id = \sigma * \mu$.
+
+    f. $id = \varphi * 1$.
+
+    g. $\sigma = \varphi * \tau$.
+
+\end{example}
+
+
+\begin{definition}
+    Обращением Дирихле функции $f$ назовем такую функцию $g$, что
+    $f * g = \chi_1$, то есть функция $g = f^{-1}$ в кольце Дирихле.
+\end{definition}
+
+\begin{theorem}
+    $\ \forall \ f : f(1) \neq 0 \ \exists \ g : f * g = \chi_1$.
+\end{theorem}
+
+\begin{proof}
+    $g(1) = \frac{1}{f(1)}$.
+
+    А для $n > 1$ функцию $g$ можно вычислить рекурсивно:
+    
+    $g(n) = -\frac{1}{f(1)} \sum \limits_{d | n, d \neq n} f(\frac{n}{d}) g(d)$.
+
+    Доказывается, что такая функция подходит, домножением на $f(1)$ и переносом всего в левую часть.
+\end{proof}
+
+\section{Поиск количества пар взаимнопростых, не больших $n$}
+
+Зачем это все нужно?
+Рассмотрим, как решать задачи при помощи обращения Мёбиуса и свертки Дирихле.
+
+\begin{designation}
+    $[P]$~--- это функция, которая равна единице, если $P$ верно, и нулю, если $P$ неверно.
+\end{designation}
+
+Давайте сначала разберемся, как пользоваться линейным решетом Эратосфена.
+Можно считать мультипликативную функцию $f$ для всех чисел от $1$ до $n$ за $\O(n)$, если за $\O(1)$ можно находить $f(p^k)$.
+
+\begin{example}
+    Дано число $n$. Надо найти количество упорядоченных пар взаимно простых чисел $x, y \le n$.
+\end{example}
+
+Обозначим ответ за $f(n)$.
+
+Сначала заметим, что  $f(n) = 2 \cdot \sum \limits_{k = 1}^{n} \varphi(k) - 1$, потому что каждую неупорядоченную пару
+$x, y$ мы посчитаем один раз в $\varphi(max(x, y))$, а нам надо посчитать упорядоченные пары, поэтому необходимо умножить на $2$. Осталось вычесть
+пары из двух одинаковых чисел. Но число взаимно просто с собой только если оно равно единице. Этой формулы нам уже хватит на самом деле, но давайте придумаем альтернативную, потому что в более сложных случаях все будет аналогично.
+
+Запишем формулу: $f(n) = \sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} [gcd(i, j) = 1]$.
+Заметим, что $[gcd(i, j) = 1] = \chi_1(gcd(i, j))$, так что можно применить свертку Мёбиуса:
+
+$$\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} \sum \limits_{d | gcd(i, j)} \mu(d) =
+\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} \sum \limits_{d = 1}^{n} [d | gcd(i, j)] \cdot \mu(d) = $$
+
+$$ = \sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} \sum \limits_{d = 1}^{n} [d | i] \cdot [d | j] \cdot \mu(d) =
+\text{\graytext{/ меняем порядок суммирования /}} = $$
+
+$$= \sum \limits_{d = 1}^{n} \mu(d) \left ( \sum \limits_{i = 1}^{n} [d | i] \right )
+\left ( \sum \limits_{j = 1}^{n} [d | j] \right)$$
+
+При этом $\sum \limits_{i = 1}^{n} [d | i] = \sum \limits_{j = 1}^{n} [d | j] = $ количеству чисел, делящихся на $d$,
+то есть $\left\lfloor \frac{n}{d}  \right\rfloor$.
+Тогда получается, что
+$f(n) = \sum \limits_{d = 1}^{n} \mu(d) \cdot \left\lfloor \frac{n}{d} \right\rfloor^2$.
+
+А эту формулу можно посчитать уже за линейное время (все значения $\mu$ считаются при помощи линейного решета за
+$O(n)$).
+
+\
+
+Нырнем глубже! Мы хотим еще быстрее.
+Пусть у нас есть некоторая мультипликативная функция $f$, и мы хотим посчитать ее префиксную сумму.
+Обозначим $s_f(n) = \sum \limits_{k = 1}^{n} f(k)$.
+Предположим, что мы обнаружили такую мультипликативную функцию $g$, что $s_g$ и $s_{f * g}$ можно быстро считать. Тогда научимся быстро считать $s_f$:
+
+$$s_{f * g}(n) = \sum \limits_{k = 1}^{n} \sum \limits_{d | k} g(d) f \left ( \frac{k}{d} \right ) = 
+\sum \limits_{d = 1}^{n} g(d) \sum \limits_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} f(k) = $$
+
+$$=g(1) \sum \limits_{k = 1}^{n} f(k) + 
+\sum \limits_{d = 2}^{n} g(d) \sum \limits_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} f(k) = 
+g(1) s_f(n) + \sum \limits_{d = 2}^{n} g(d) s_f\left(\left\lfloor \frac{n}{d} \right\rfloor\right)$$
+
+Теперь перенесем $s_f(n)$ в одну часть, а все остальное в другую:
+
+$$s_f(n) = \frac{s_{f * g}(n) - \sum_{d = 2}^{n} s_f \left ( \left\lfloor \frac{n}{d} \right\rfloor \right ) g(d)}{g(1)}$$
+
+\begin{observation}
+    Обратите внимание, что если $g$~--- мультипликативная функция, то $g(k) = g(1) \cdot g(k)$ для любого $k$, поэтому если $g$~--- это не тождественный ноль, то $g(1) = 1$, так что делить на знаменатель нам не придется.
+\end{observation}
+
+Осталось научиться быстро считать сумму в числителе.
+
+\begin{lemma}
+    Среди чисел $\left\lfloor \frac{n}{1} \right\rfloor, \left\lfloor \frac{n}{2} \right\rfloor, \ldots, 
+    \left\lfloor \frac{n}{n} \right\rfloor$ не более $2 \sqrt{n}$ различных.
+\end{lemma}
+
+\begin{proof}
+    Стандартное доказательство. Есть $\sqrt{n}$ чисел вида $\left\lfloor \frac{n}{d} \right\rfloor$, где $d < \sqrt{n}$,
+    а для $d \ge \sqrt{n}$ будет выполнено $\left\lfloor \frac{n}{d} \right\rfloor \le \sqrt{n}$, поэтому
+    среди них тоже не больше, чем $\sqrt{n}$ различных.
+
+    Также есть простой алгоритм перебора отрезков одинаковых значений $\left\lfloor \frac{n}{d} \right\rfloor$:
+
+\begin{code}
+for (int left = 1, right; left <= n; left = right) {
+    right = n / (int)(n / left) + 1;
+    // in [left; right) values of n/d are equal
+}
+\end{code}
+
+\end{proof}
+
+
+Из леммы следует, что сумма в числителе разбивается на $O(\sqrt{n})$ рекурсивных вызовов
+$s_f(\left\lfloor \frac{n}{d} \right\rfloor)$ и подсчетов $g$ на отрезке, но сумма $g$ на отрезке~--- это разность
+двух префиксных сумм, которые мы по предположению задачи умеем быстро считать.
+
+Получился рекурсивный алгоритм. Соптимизируем его, сохраняя уже посчитанные значения $s_f(k)$ в хеш-таблицу,
+чтобы не считать их заново.
+
+\begin{lemma}
+    Пусть $a$, $b$ и $c$~~--- натуральные числа. Тогда
+
+    $$\left\lfloor \frac{\left\lfloor \frac{a}{b} \right\rfloor}{c} \right\rfloor = \left\lfloor \frac{a}{bc} \right\rfloor$$
+\end{lemma}
+
+\begin{proof}
+    Очевидно, что $0 \le \frac{a}{b} - \left\lfloor \frac{a}{b} \right\rfloor < 1$,
+    поэтому $0 \le \frac{a}{bc} - \frac{\left\lfloor \frac{a}{b} \right\rfloor}{c} < \frac{1}{c}$.
+    При этом $\left\lfloor \frac{a}{b} \right\rfloor$~--- целое число, поэтому
+    дробная часть $\frac{\left\lfloor \frac{a}{b} \right\rfloor}{c}$ не больше $\frac{c - 1}{c}$, так что при прибавлении
+    чего-то меньшего, чем $\frac{1}{c}$, мы не перепрыгнем на следующюю целую часть.
+\end{proof}
+
+Из леммы слеудет, что за время алгоритма мы посетим только числа вида $\left\lfloor \frac{n}{d} \right\rfloor$,
+потому что $\left\lfloor \frac{\left\lfloor \frac{n}{d_1} \right\rfloor}{d_2} \right\rfloor = 
+\left\lfloor \frac{n}{d_1 d_2} \right\rfloor$.
+
+Подсчет $s_f(k)$ занимает $O(\sqrt{k})$ времени + рекурсивные вызовы.
+Так что итоговая асимптотика будет равна 
+
+$$\O\left(\sum \limits_{k = 1}^{n} \sqrt{\left\lfloor \frac{n}{k} \right\rfloor}\right)
+\text{\graytext{/ сумма берется по различным значениям /}}
+\le \O\left(\sum \limits_{k = 1}^{\sqrt{n}} \sqrt{k} + \sum \limits_{k = 1}^{\sqrt{n}} \sqrt{\frac{n}{k}}\right)$$
+
+Когда в асимптотике есть сумма возрастающей/убывающей функции, эту сумму можно заменить на интеграл без потерь.
+
+$\sum \limits_{k = 1}^{\sqrt{n}} \sqrt{k} \sim \int \limits_{1}^{\sqrt{n}} \sqrt{k} dk = \frac{2}{3} k^{\frac{3}{2}} |_1^{\sqrt{n}} = 
+O(n^{\frac{3}{4}})$
+
+$\sum \limits_{k = 1}^{\sqrt{n}} \sqrt{\frac{n}{k}} \sim \int \limits_{1}^{\sqrt{n}} \sqrt{\frac{n}{k}} dk = $
+$2 \sqrt{nk} |_1^{\sqrt{n}} = O(n^{\frac{3}{4}})$
+
+Получили, что асимптотика~--- $O(n^{\frac{3}{4}})$.
+
+Самое время вспомнить о том, что функция $f$ мультипликативная.
+А для мультипликативных функций мы умеем считать ее первые $k$ значений за $O(k)$ при помощи линейного решета Эратосфена. 
+Тогда и префиксные суммы мы тоже можем посчитать за $O(k)$.
+Пусть мы предпосчитали префиксные суммы для первых $k \ge \sqrt{n}$ чисел.
+Тогда нам надо брать сумму времени работы только для таких $\left\lfloor \frac{n}{d} \right\rfloor$, которые больше $k$.
+Получаем асимптотику
+$O(k + \sum \limits_{i = 1}^{\frac{n}{k}} \sqrt{\frac{n}{i}}) = O(k + \frac{n}{\sqrt{k}})$
+(этот интеграл мы уже брали, надо подставить только в другой точке).
+Минимума эта величина достигает при $k = O(n^{\frac{2}{3}})$ (сумма возрастающей и убывающей функций достигает асимптотического минимума в точке пересечения). В этом случае асимптотика получается равна $O(n^{\frac{2}{3}})$.
+
+
+Ура, мы научились искать префиксную сумму мультипликативной функции $f$ за $O(n^{\frac{2}{3}})$, если 
+есть такая функция $g$, что $s_g$ и $s_{f * g}$ мы умеем считать за $O(1)$.
+
+Откуда же взять эту функцию $g$? Мы знаем несколько примеров таких функций: $\chi_1, id, 1$ и так далее.
+Надо поперебирать эти функции, пока их свертка с $f$ не получится равной тоже какой-то простой функции.
+Если не нашлось, то очень жаль, ничего не получилось.
+
+\begin{example}
+    Вернемся к нашей задаче поиска количества упорядоченных пар взаимно простых чисел $x, y \le n$.
+
+    Мы уже выяснили, что $f(n) = \sum \limits_{d = 1}^{n} \mu(d) \left\lfloor \frac{n}{d} \right\rfloor^2$.
+    Как мы уже поняли, среди чисел вида $\left\lfloor \frac{n}{d} \right\rfloor$ всего $\sqrt{n}$ различных.
+    А $\mu$ является мультипликативной функцией, при этом
+    $\mu * 1 = \chi_1$. Так что сумму $\mu$ на отрезке мы умеем считать быстро.
+    Посмотрим, в каких точках $m$ нам надо будет считать $s_{\mu}(m)$.
+    Это будут такие $m$, что на них число $\left\lfloor \frac{n}{m} \right\rfloor$ увеличилось.
+    Нетрудно понять, что это будут как раз числа вида $\left\lfloor \frac{n}{k} \right\rfloor$.
+    Поэтому нам надо будет посчитать $s_{\mu}$ ровно в точках вида $\left\lfloor \frac{n}{k} \right\rfloor$,
+    а это мы умеем делать суммарно за $O(n^{\frac{2}{3}})$.
+\end{example}
+
+\begin{example}
+    $\varphi * 1 = id$. Так что $s_{\varphi}$ тоже можно считать за $O(n^{\frac{2}{3}})$. И в действительности в данном случае нам этого достаточно, потому что мы с самого начала выразили количество пар взаимно простых через префиксные суммы $\varphi$.
+\end{example}
+
+
+\section{Сумма попарных НОДов чисел, не больших $n$}
+
+
+\begin{example}
+    Дано число $n$. Надо найти
+
+    $$\sum_{i = 1}^n \sum_{j = 1}^n gcd(i, j)$$
+
+    То есть сумму попарных НОДов всех чисел, которые не больше $n$.
+\end{example}
+
+Давайте воспользуемся похожими на пример с парами взаимно простых свойствами. Давайте перебирать этот самый НОД $d$ от $1$ до $n$ и считать количество пар чисел, у которых НОД равен $d$. Если НОД равен $d$, то точно оба числа $i$ и $j$ делятся на $d$, однако если мы поделим их на $d$ и получим числа $i'$ и $j'$, то эти два числа уже взаимно просты. Поэтому на самом деле количество пар чисел $i$ и $j$, НОД которых равен $d$, совпадает с количеством пар чисел $i'$ и $j'$, которые не больше $\left\lfloor \frac{n}{d} \right\rfloor$, и при этом взаимно просты. А это как раз $f(\left\lfloor \frac{n}{d} \right\rfloor)$ в обозначениях прошлого примера. То есть формула получается такая:
+
+$$\sum_{d = 1}^{n} d \cdot f(\left\lfloor \frac{n}{d} \right\rfloor)$$
+
+Как и раньше, мы знаем, что $\left\lfloor \frac{n}{d} \right\rfloor$ меняется не очень часто, поэтому есть $\sqrt{n}$ отрезков равенства, на которых нужно один раз посчитать $f$, а также высчитать сумму $d$ на отрезке. Так же, как и в примере с $\mu$ в прошлый раз, вызов $f(n)$ посчитает сразу же все нужные нам значения $f$, поэтому итоговая асимптотика будет $O(n^{\frac{2}{3}})$.
+
+\section{Сумма попарных НОКов чисел, не больших $n$}
+
+\begin{example}
+    Дано число $n$. Надо найти
+
+    $$\sum_{i = 1}^n \sum_{j = 1}^n lcm(i, j)$$
+
+    То есть сумму попарных НОКов всех чисел, которые не больше $n$.
+\end{example}
+
+В этом нам поможет следующий общеизвестный факт:
+
+\begin{observation}
+\label{Mobius: gcdlcm}
+
+    $$a \cdot b = gcd(a, b) \cdot lcm(a, b)$$
+\end{observation}
+
+Давайте запишем нашу сумму как обычно:
+
+$$
+\sum_{i = 1}^{n} \sum_{j = 1}^{n} \sum_{c = 1}^{n} c \cdot [lcm(i, j) = c] = \text{\graytext{/ По замечанию \ref{Mobius: gcdlcm} /}} = \sum_{i = 1}^{n} \sum_{j = 1}^{n} \sum_{d = 1}^{n} \frac{i \cdot j}{d} \cdot [gcd(i, j) = d] = 
+$$
+
+$$
+= \text{\graytext{/ $i' = \frac{i}{d}$ и $j' = \frac{j}{d}$ /}} = \sum_{d = 1}^{n} \sum_{i' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \sum_{j' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \frac{i' \cdot d \cdot j' \cdot d}{d} \cdot [gcd(i', j') = 1] = 
+\sum_{d = 1}^{n} \sum_{i' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \sum_{j' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} i' \cdot d \cdot j' \cdot \chi_1(gcd(i', j')) = 
+$$
+
+$$
+= \text{\graytext{/ по формуле для $\chi_1$, доказанной в \ref{Mobius: chi} /}} = 
+\sum_{d = 1}^{n} \sum_{i' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \sum_{j' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} i' \cdot d \cdot j' \sum_{k | gcd(i', j')} \mu(k) = $$
+
+
+$$ = \sum_{d = 1}^{n} \sum_{i' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \sum_{j' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} i' \cdot d \cdot j' \sum_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} [k | i'] \cdot [k | j'] \cdot \mu(k) = 
+$$
+
+$$
+= \sum_{d = 1}^{n} d \sum_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \mu(k) \cdot \left ( \sum_{i' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} i' \cdot [k | i'] \right ) \cdot \left ( \sum_{j' = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} j' \cdot [k | j'] \right ) = \star
+$$
+
+Оба выражения в скобках равны сумме чисел $\le \left\lfloor \frac{n}{d} \right\rfloor$, которые делятся на $k$. Это числа $k, 2k, \ldots, \left\lfloor \frac{\left\lfloor \frac{n}{d} \right\rfloor}{k} \right\rfloor \cdot k = \left\lfloor \frac{n}{dk} \right\rfloor \cdot k$.
+Их сумма равна 
+
+$$k \cdot \frac{\left ( \left\lfloor \frac{n}{dk} \right\rfloor \right ) \cdot \left ( \left\lfloor \frac{n}{dk} \right\rfloor + 1 \right )}{2}$$
+
+Обозначим второй множитель за $g(\left\lfloor \frac{n}{dk} \right\rfloor)$
+
+Подставим это в нашу формулу:
+
+$$
+\star = \sum_{d = 1}^{n} d \sum_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \mu(k) \cdot k^2 \cdot g^2\left(\left\lfloor \frac{n}{dk} \right\rfloor\right) = \text{\graytext{/ обозначим $l = kd$ /}} = 
+$$
+
+$$
+= \sum_{l = 1}^{n} l \cdot g^2\left(\left\lfloor \frac{n}{l} \right\rfloor\right) \sum_{k | l} k \cdot \mu(k) = \text{/ \graytext{$h(l) := l \cdot \sum_{k | l} k \cdot \mu(k) $ /}} = \sum_{l = 1}^{n} g^2\left(\left\lfloor \frac{n}{l} \right\rfloor\right) \cdot h(l)
+$$
+
+При этом $h$ можно выразить как $id \cdot (1 * (id \cdot \mu))$, так что $h$ мультипликативна, потому что и свертка, и произведение мультипликативных функций являются мультипликативными. Кроме того, $g(n, l)$ вычисляется по формуле, поэтому ее мы можем считать за $\O(1)$. Так что такую сумму можно считать за $\O(n)$, так как мультипликативную функцию $h$ можно насчитать линейным решетом ($h(p^k) = p^k \cdot (1 - p)$ вычисляется за $\O(1)$).
+
+Однако мы хотим быстрее. В $g$ мы подставляем всего $\sqrt{n}$ различных значений, поэтому как раньше, нам надо научиться быстро считать $s_h$. Для этого нужно найти какую-то мультипликативную функцию $q$, чтобы $s_q$ и $s_{h * q}$ можно было считать за $\O(1)$.
+
+Давайте докажем, что $h * id^2 = id$. В этом нам поможет следующий факт:
+
+\begin{lemma}
+    Для любых арифметических функций $f, g$ верно:
+
+    $$(id \cdot f) * (id \cdot g) = id \cdot (f * g)$$
+\end{lemma}
+
+\begin{proof}
+    Это доказывается простой подстановкой:
+
+    $$\left((id \cdot f) * (id \cdot g)\right)(n) = \sum_{d | n} d \cdot f(d) \cdot \frac{n}{d} \cdot g\left(\frac{n}{d}\right) = n \cdot \sum_{d | n}  f(d) \cdot g\left(\frac{n}{d}\right) = n \cdot (f * g)$$
+\end{proof}
+
+Мы хотим доказать, что $h * id^2 = id$. Запишем цепочку равенств:
+
+$$h * id^2 = (id \cdot (1 * (id \cdot mu))) * (id \cdot id) = \text{\graytext{/ по лемме /}} = id \cdot ((1 * (id \cdot mu)) * id) = $$
+
+$$ = \text{\graytext{/ по ассоциативности свертки /}} = id \cdot (1 * ((id \cdot mu) * (id \cdot 1))) = \text{\graytext{/ по лемме /}} = id \cdot (1 * (id \cdot (\mu * 1))) = $$
+
+$$ = \text{\graytext{/ по примеру c. из \ref{Mobius: 1mu} /}} = id \cdot (1 * (id \cdot \chi_1)) = \text{\graytext{/ $\chi_1$ не равна нулю только в единице, а $id(1) = 1$ /}} = $$
+
+$$= id \cdot (1 * \chi_1) = \text{\graytext{/ по свойству 4 из \ref{Mobius: dirform} /}} = id \cdot 1 = id$$
+
+Что и требовалось доказать. При этом $s_{id}$ и $s_{id^2}$ можно легко вычислять за $\O(1)$:
+
+$$s_{id}(n) = \frac{n \cdot (n + 1)}{2}$$
+
+$$s_{id^2}(n) = \frac{n \cdot (n + 1) \cdot (2 n + 1)}{6}$$
+
+Так что мы научились искать сумму НОКов всех пар чисел, не больших $n$, за $\O(n^{\frac{2}{3}})$.
+
+
+
+\section{Задачи для практики}
+
+\begin{itemize}
+    \item \href{https://www.codechef.com/NOV15/problems/SMPLSUM}{https://www.codechef.com/NOV15/problems/SMPLSUM}
+
+    \item \href{http://acm.hdu.edu.cn/showproblem.php?pid=1695}{http://acm.hdu.edu.cn/showproblem.php?pid=1695}
+
+    \item \href{http://poj.org/problem?id=3904}{http://poj.org/problem?id=3904}
+
+    \item \href{http://acm.hdu.edu.cn/showproblem.php?pid=5608}{http://acm.hdu.edu.cn/showproblem.php?pid=5608}
+
+    \item \href{https://www.spoj.com/problems/DIVCNT2/}{https://www.spoj.com/problems/DIVCNT2/}
+   
+\end{itemize}
+
+
