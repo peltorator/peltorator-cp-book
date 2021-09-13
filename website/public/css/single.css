@@ -1,0 +1,7 @@
+#main > h1 {
+    text-align: center;
+}
+
+#main > div + .content {
+    padding-top: 1rem;
+}

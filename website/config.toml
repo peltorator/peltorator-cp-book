@@ -1,0 +1,39 @@
+baseURL = "https://peltorator.ru/try_web/"
+defaultContentLanguage = "ru"
+hasCJKLanguage = true
+languageCode = "ru"
+paginate = 5
+theme = "hugo-theme-texify"
+title = "peltorator"
+
+disqusShortname = ""
+googleAnalytics = ""
+pygmentsUseClasses = true
+
+[author]
+name = "peltorator"
+
+[markup]
+  defaultMarkdownHandler = "goldmark"
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[params]
+  customCSS = []
+  dateFormat = "2006-01-02"
+  description = "an example site for hugo theme TeXify"
+  enableFullRSS = true
+  enableHanEmph = true
+  enableMathjax = true
+  favicon = "/favicon.ico"
+  footnote = ""
+  keywords = ["hugo", "latex", "theme"]
+
+# see https://utteranc.es for installation guide
+[params.utterances]
+  enable = false
+  repo = ""
+  issue_term = "pathname"
+  label = "Comment"
+  theme = "github-light"
