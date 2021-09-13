@@ -11,4 +11,5 @@
 **/cp_dictionary
 **/debugger
 **/flows
-
+*.cpt
+LaTeX/main.run.xml
