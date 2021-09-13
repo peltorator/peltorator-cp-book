@@ -2,4 +2,13 @@
 *.exrc
 *.pdf
 *.jpg
+*.png
+*.tif
+**/manim
+**/pictures
 **/codes_to_research
+**/codes_research
+**/cp_dictionary
+**/debugger
+**/flows
+
