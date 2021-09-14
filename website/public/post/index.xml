@@ -6,7 +6,809 @@
     <description>Recent content in Posts on peltorator</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ru</language>
-    <lastBuildDate>Sun, 12 Sep 2021 13:20:05 +0300</lastBuildDate><atom:link href="https://peltorator.ru/try_web/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 14 Sep 2021 13:38:44 +0300</lastBuildDate><atom:link href="https://peltorator.ru/try_web/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Стресс-тестирование</title>
+      <link>https://peltorator.ru/try_web/post/stress/</link>
+      <pubDate>Tue, 14 Sep 2021 13:38:44 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/stress/</guid>
+      
+      <description>&lt;h2 id=&#34;общие-концепции&#34;&gt;Общие концепции&lt;/h2&gt;
+&lt;p&gt;Стресс-тестирование — это не тестирование задачи в последние минуты контеста под большим давлением.
+Стресс-тестирование — это тестирование вашего кода сразу на большом количестве автоматически генерируемых тестов для поиска того теста, на котором ваше решение работает неправильно.&lt;/p&gt;
+&lt;p&gt;Стандартный сценарий, когда вам нужен стресс: вы заслали решение в систему, получили WA, но ни ошибка в коде, ни неработающий тест никак не хотят находиться. Для стресс-тестирования вам нужны следующие компоненты:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;smart.cpp&lt;/code&gt;. Ваше решение, которое по какой-то причине не проходит тесты.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;stupid.cpp&lt;/code&gt;. Тупое решение. Чаще всего за большую асимптотику. Очень важно, чтобы это решение было максимально тупым, и вы были уверены, что в нем нет никаких ошибок.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;gen.cpp&lt;/code&gt;. Генератор тестов. Чаще всего тесты генерируются случайные, при этом они должны быть не очень большие, чтобы тупое решение тоже могло быстро на них работать, а также, чтобы вы могли потом найти ошибку в своем коде, используя этот тест. Когда вы нашли неработающий тест, попытайтесь максимально его минимизировать. Уменьшить константу в генераторе и так далее. Чем проще тест, тем легче вам будет исправлять ошибку.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;stress.sh&lt;/code&gt;. Скрипт, который будет повторять следующий процесс: сгенерировать тест, запустить на нем умное решение, запустить на нем тупое решение, сравнить ответы. Если ответы равны, нужно повторить процесс, а если не равны, выдать тот тест, на котором ваше решение работает неправильно, и завершиться.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;checker.cpp&lt;/code&gt;. Пункт, который редко будет вам нужен, но все же может понадобиться, — это чекер. Не всегда в задаче существует единственный правильный ответ на каждый тест. К примеру, если задача заключается в том, чтобы разложить число на два множителя, то разных ответов может быть несколько, и каждый из них при этом верный. Поэтому вам может понадобиться написать программу, которая проверяет правильность вашего ответа, учитывая ответ тупого решения. Также бывает так, что тупого решения написать нет возможности, потому что любое тупое решение по сложности сопоставимо с вашим умным решением. В этом случае вам может помочь некоторая промежуточная мера, когда у вас есть только чекер. Этот чекер может сделать некоторые проверки ответа на адекватность (к примеру, проверить, что в задаче о разложении на два множителя, произведение этих множителей равно входному числу). Эта проверка может не покрывать все случаи, когда ваше решение работает некорректно, но все равно может помочь вам найти нужный тест.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;smart.cpp&lt;/code&gt; у вас уже есть, потому что это ваше решение. Чтобы написать &lt;code&gt;stupid.cpp&lt;/code&gt;, надо просто представить, что ограничения в задаче маленькие, и написать другое решение. Как уже было сказано ранее, очень важно писать максимально простой код, чтобы не допускать ошибок. &lt;code&gt;checker.cpp&lt;/code&gt; принимает на вход три файла: входной файл, правильный ответ и ваш ответ, и проверяет по ним корректность вашего ответа.&lt;/p&gt;
+&lt;p&gt;Теперь осталось разобраться, как правильно писать &lt;code&gt;gen.cpp&lt;/code&gt; и &lt;code&gt;stress.sh&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Обратите внимание, что здесь речь идет про shell стрессы в linux. В других случаях могут отличаться детали, однако пока мы говорим больше про общие концепции. Конкретные несоответствия будут освещены в соответствующих секциях позже.&lt;/p&gt;
+&lt;p&gt;Генератор должен создавать случайный тест (небольшого размера). Рекомендуется использовать фиксированный сид рандома, чтобы тесты были воспроизводимы. При этом мы хотим запускать генератор много раз и получать разные тесты. Давайте для этого передавать сид рандома в аргументах командной строки. Функция &lt;code&gt;main&lt;/code&gt; может принимать два параметра: &lt;code&gt;agrc&lt;/code&gt; и &lt;code&gt;argv&lt;/code&gt;. &lt;code&gt;argc&lt;/code&gt; — это количество аргументов командной строки, а &lt;code&gt;argv&lt;/code&gt; — это массив аргументов размера &lt;code&gt;argc&lt;/code&gt;. К примеру, если вы скомпилировали ваш код в файл &lt;code&gt;main&lt;/code&gt; и запускаете его командой &lt;code&gt;./main aba 123 8&lt;/code&gt;, то &lt;code&gt;argc&lt;/code&gt; будет равен $4$, а в &lt;code&gt;argv&lt;/code&gt; будут храниться &lt;code&gt;./main&lt;/code&gt;, &lt;code&gt;aba&lt;/code&gt;, &lt;code&gt;123&lt;/code&gt; и &lt;code&gt;8&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Нам нужно передавать всего один параметр, который будет храниться в &lt;code&gt;argv[1]&lt;/code&gt;. Правда, он там будет храниться в типе &lt;code&gt;char*&lt;/code&gt; (строки из C), а нам нужно число. Для перевода можно воспользоваться функцией &lt;code&gt;atoi&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Кроме того, стоит помнить о том, что пользоваться стоит не функцией &lt;code&gt;rand&lt;/code&gt;, а генератором &lt;code&gt;mt_19937&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Если вы все таки решили не использовать аргументы командной строки, вам нужен случайный сид. Обычно для этого используют текущее время. Однако вам нужно, чтобы это текущее время менялось часто, а не каждую секунду, к примеру. Потому что в таком случае вы целую секунду будете кучу раз запускать один и тот же тест. Для этого вам поможет следующая инициализация рандома:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Подробнее про генерацию случайных чисел можно прочитать в &lt;a href=&#34;https://peltorator.ru/try_web/try_web/post/random/&#34;&gt;соответствующей статье&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Вооружившись всеми этими знаниями, давайте напишем генератор для задачи &amp;laquo;A+B&amp;raquo;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;iostream&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;random&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;cstdlib&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;using&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;namespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;argc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;argv&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[])&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;seed&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;atoi&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;argv&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;mt19937&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;seed&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;n&#34;&gt;cout&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;sc&#34;&gt;&amp;#39; &amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Теперь наша задача заключается в том, чтобы по очереди запускать &lt;code&gt;gen&lt;/code&gt;, записывать его результат в файл, запускать два решения и сравнивать их ответы. Рассмотрим разные варианты того, как это можно делать.&lt;/p&gt;
+&lt;h2 id=&#34;linux-shell-стрессы&#34;&gt;Linux: Shell стрессы&lt;/h2&gt;
+&lt;p&gt;Если вы пользуетесь linux, macos и т.п., то вам подойдет этот вариант. Если вы пользуетесь Windows, то для вас есть следующая секция.&lt;/p&gt;
+&lt;p&gt;Мы напишем shell скрипт, который будет делать то, что нам нужно. Для этого нужно создать файл с расширением &lt;code&gt;.sh&lt;/code&gt;, в котором можно писать команды как в консоли, а также использовать циклы и т.п.&lt;/p&gt;
+&lt;p&gt;Для начала нужно скомпилировать все наши файлы (&lt;code&gt;smart&lt;/code&gt;, &lt;code&gt;stupid&lt;/code&gt;, &lt;code&gt;gen&lt;/code&gt; и, возможно, &lt;code&gt;checker&lt;/code&gt;). Рекомендуется при стресс-тестировании максимально приближаться к компиляции программ в тестирующей системе и использовать соответствующую оптимизацию (скорее всего, это &lt;code&gt;-O2&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Далее мы запускаем цикл, в котором выполняем программы (компилируем мы один раз, а выполняем потом сколько угодно) и сравниваем результаты их работы.&lt;/p&gt;
+&lt;p&gt;Пример стресса:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 smart.cpp -o smart
+g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 stupid.cpp -o stupid
+g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 gen.cpp -o gen
+
+&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; t in &lt;span class=&#34;k&#34;&gt;$(&lt;/span&gt;seq &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; 100000&lt;span class=&#34;k&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;do&lt;/span&gt;
+    &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Running test &lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$t&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;
+    ./gen &lt;span class=&#34;nv&#34;&gt;$t&lt;/span&gt; &amp;gt; input
+    ./smart &amp;lt; input &amp;gt; smart_output
+    ./stupid &amp;lt; input &amp;gt; stupid_output
+    diff smart_output stupid_output &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;exit&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;В первых трех строчках мы компилируем наши программы. Рассмотрим, к примеру, первую строчку. Здесь &lt;code&gt;g++&lt;/code&gt; — это компилятор c++, &lt;code&gt;-std=c++17&lt;/code&gt; устанавливает версию c++, под которой мы хотим компилировать программу, &lt;code&gt;-O2&lt;/code&gt; устанавливает нужный уровень оптимизаций, а &lt;code&gt;-o smart&lt;/code&gt; говорит о том, что мы хотим скомпилировать программу в файл под названием &lt;code&gt;smart&lt;/code&gt; (обратите внимание, что в данном случае у него нет никакого расширения). Остальные две компиляции аналогичны.&lt;/p&gt;
+&lt;p&gt;Далее на 5 строке представлен код цикла, который перебирает переменную &lt;code&gt;t&lt;/code&gt; от $1$ до $100000$. Обратите внимание, что цикл завершается словом &lt;code&gt;done&lt;/code&gt; в конце скрипта. После чего при помощи команды &lt;code&gt;echo&lt;/code&gt; мы выводим на экран номер теста, чтобы можно было отслеживать прогресс.&lt;/p&gt;
+&lt;p&gt;Затем запускаются программы. Здесь &lt;code&gt;./gen&lt;/code&gt; означает запуск программы &lt;code&gt;gen&lt;/code&gt;, &lt;code&gt;$t&lt;/code&gt; означает, что мы передаем число &lt;code&gt;t&lt;/code&gt; как параметр. Знак больше перенаправляет вывод программы. Таким образом, наш генератор будет писать тест не в консоль, а в файл под названием &lt;code&gt;input&lt;/code&gt;. Затем мы аналогично запускаем два решения. Они пишут в файлы &lt;code&gt;smart_output&lt;/code&gt; и &lt;code&gt;stupid_output&lt;/code&gt;. При этом в этих строчках есть еще знак меньше, который наоборот означает то, откуда мы читаем входные данные. То, какой знак нужно использовать для чего, легко понять по направлению стрелочки. У знака &lt;code&gt;&amp;gt;&lt;/code&gt; стрелочка указывает внутрь файла, то есть в этот файл мы выводим информацию, а у знака &lt;code&gt;&amp;lt;&lt;/code&gt; стрелочка указывает наружу, то есть из этого файла мы достаем информацию.&lt;/p&gt;
+&lt;p&gt;После того, как программы отработали, настало время проверить совпадение ответов. Для этого мы воспользуемся консольной утилитой &lt;code&gt;diff&lt;/code&gt;, которая сравнивает файлы на совпадение. Стоит обратить внимание, что если мы не пишем чекер и пользуемся &lt;code&gt;diff&lt;/code&gt;&amp;lsquo;ом, то формат вывода у обеих программ должен совпадать с точностью до пробелов. Утилита &lt;code&gt;diff&lt;/code&gt; возвращает $1$, если файлы равны, и $0$, если файлы не равны. Далее мы используем оператор &lt;code&gt;||&lt;/code&gt;, который, как и в c++, означает &amp;laquo;или&amp;raquo;. Если &lt;code&gt;diff&lt;/code&gt; вернул $1$, то результат &amp;laquo;или&amp;raquo; уже равен единице и второй аргумент не вычисляется. Если же было возвращено значение $0$, то выполняется вторая команда &lt;code&gt;exit&lt;/code&gt;, которая завершает наш скрипт. Кроме того, &lt;code&gt;diff&lt;/code&gt; в этом случае выведет на экран места, в которых различаются файлы. Далее можно уже зайти в файл &lt;code&gt;input&lt;/code&gt;, посмотреть, какой там тест, и пользоваться им для отладки программы. Если же неправильный тест не находится, то либо вы допустили ошибку при написании стресса, либо ваше решение верное, либо ошибка просто не ловится вашим стрессом (возможно, она проявляется только на больших тестах).&lt;/p&gt;
+&lt;p&gt;Чтобы запустить этот скрипт, нужно просто написать в консоль &lt;code&gt;./stress.sh&lt;/code&gt;, если вы сохранили его в соответствующий файл. Однако, вероятно, вам выдадут строчку примерно такого содержания:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;permition denied: ./stress.sh&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Дело в том, что по умолчанию у файлов нет прав на исполнение. Так что нужно их добавить. Это можно сделать при помощи следующей команды:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;chmod +x stress.sh&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;И  затем попытаться запустить скрипт заново.&lt;/p&gt;
+&lt;p&gt;Теперь поговорим об улучшениях, которые можно сделать к нашему стрессу. Во-первых, может возникнуть ситуация, в которой какая-то из запускаемых программ упадет с ошибкой выполнения. Наш стресс это просто проигнорирует. Давайте это обработаем. Для этого просто добавим &lt;code&gt;|| exit&lt;/code&gt; в конец запусков наших программ аналогично строке с &lt;code&gt;diff&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 smart.cpp -o smart
+g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 stupid.cpp -o stupid
+g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 gen.cpp -o gen
+
+&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; t in &lt;span class=&#34;k&#34;&gt;$(&lt;/span&gt;seq &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; 100000&lt;span class=&#34;k&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;do&lt;/span&gt;
+    &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Running test &lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$t&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;
+    ./gen &lt;span class=&#34;nv&#34;&gt;$t&lt;/span&gt; &amp;gt; input &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;exit&lt;/span&gt;
+    ./smart &amp;lt; input &amp;gt; smart_output &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;exit&lt;/span&gt;
+    ./stupid &amp;lt; input &amp;gt; stupid_output &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;exit&lt;/span&gt;
+    diff smart_output stupid_output &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;exit&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Теперь наша программа завершится, если какая-то из программ упала. Однако мы не знаем, какая. Мы можем попытаться запустить их по очереди и проверить. Либо можно добавить описание причины ошибки:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 smart.cpp -o smart
+g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 stupid.cpp -o stupid
+g++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++17 -O2 gen.cpp -o gen
+
+&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; t in &lt;span class=&#34;k&#34;&gt;$(&lt;/span&gt;seq &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; 100000&lt;span class=&#34;k&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;do&lt;/span&gt;
+    &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Running test &lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$t&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;
+    ./gen &lt;span class=&#34;nv&#34;&gt;$t&lt;/span&gt; &amp;gt; input &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;gen failed&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; exit&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+    ./smart &amp;lt; input &amp;gt; smart_output &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;smart failed&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;exit&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+    ./stupid &amp;lt; input &amp;gt; stupid_output &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;stupid failed&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;exit&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+    diff smart_output stupid_output &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;outputs aren&amp;#39;t equal&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; exit&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;windows-bat-стрессы&#34;&gt;Windows: Bat стрессы&lt;/h2&gt;
+&lt;p&gt;Аналогичный пример с bat скриптами в Windows:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bat&#34; data-lang=&#34;bat&#34;&gt;g++ -std=c++17 -O2 smart.cpp -o smart.exe
+g++ -std=c++17 -O2 stupid.cpp -o stupid.exe
+g++ -std=c++17 -O2 gen.cpp -o gen.exe
+
+&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;nl&#34;&gt;beg&lt;/span&gt;
+gen.exe &lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; input &lt;span class=&#34;p&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;exit&lt;/span&gt;
+smart.exe &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt; input &lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; smart_output
+stupid.exe &lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt; input &lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; stupid_output
+fc smart_output stupid_output
+&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;errorlevel&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;goto&lt;/span&gt; &lt;span class=&#34;nl&#34;&gt;bug&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;goto&lt;/span&gt; &lt;span class=&#34;nl&#34;&gt;beg&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;nl&#34;&gt;bug&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;echo&lt;/span&gt; found!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Компиляция аналогична варианту с linux. Далее мы используем goto как циклы, бесконечно запуская тесты (здесь представлена вариация без входных параметров, то есть в коде должен использоваться часто меняющийся рандом). Далее используется команда &lt;code&gt;fc&lt;/code&gt;, аналогичная &lt;code&gt;diff&lt;/code&gt; в linux.&lt;/p&gt;
+&lt;h2 id=&#34;python-стрессы&#34;&gt;Python стрессы&lt;/h2&gt;
+&lt;p&gt;В данном подходе мы используем вместо shell или bat скрипта более высокоуровневый вариант — питон. Из него мы можем запускать все те же консольные команды, но кроме того можем, к примеру, написать прямо там без труда свой собственный чекер или генератор (или не писать). Особых отличий от скриптовых вариантов больше нет, рекомендуется изучить код:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-py&#34; data-lang=&#34;py&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;os&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;sys&lt;/span&gt;
+
+&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;100000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+    &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;Running test&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;os&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;popen&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;./gen &amp;gt; input&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;smart_ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;os&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;popen&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;./smart &amp;lt; input&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;readlines&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;stupid_ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;os&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;popen&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;./stupid &amp;lt; input&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;readlines&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;smart_ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;stupid_ans&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Outputs aren&amp;#39;t equal&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Input:&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;input&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;readlines&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()))&lt;/span&gt;
+        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;stupid answer:&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;stupid_ans&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;smart answer:&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;smart_ans&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;sys&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;exit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;All tests passed&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Здесь &lt;code&gt;os.popen&lt;/code&gt; выполняет консольную команду, а &lt;code&gt;readlines&lt;/code&gt; сохраняет вывод программы.&lt;/p&gt;
+&lt;p&gt;Плюсом этого подхода является платформонезависимость.&lt;/p&gt;
+&lt;h2 id=&#34;in-code-стрессы&#34;&gt;In-Code стрессы&lt;/h2&gt;
+&lt;p&gt;Наверное, самый простой вариант — сделать все в одной программе. Здесь &lt;code&gt;smart&lt;/code&gt;, &lt;code&gt;stupid&lt;/code&gt;, &lt;code&gt;gen&lt;/code&gt; и &lt;code&gt;checker&lt;/code&gt; будут не отдельными программами, а функциями. Вероятно также, что ввод-вывод в этом случае тестироваться не будут. Только смысловая часть программы. Если вы заранее не писали код в формате блоков: отдельная функция для ввода, отдельная функция для решения, отдельная функция для вывода, то вам придется немного поменять свое решение.&lt;/p&gt;
+&lt;p&gt;Однако плюсом данного подхода является его быстрота. Здесь мы не запускаем никаких программ, не пишем в файлы и т.д. В результате чего мы можем запускать миллионы тестов в секунду.&lt;/p&gt;
+&lt;p&gt;Если два решения используют функции или переменные с одинаковыми названиями, можно просто заключить оба решения в два разных пространства имен: &lt;code&gt;NamespaceSmart&lt;/code&gt; и &lt;code&gt;NamespaceStupid&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Пример такого стресса для задачи поиска квадрата числа можно посмотреть по &lt;a href=&#34;https://pastebin.com/HqQkPNVG&#34;&gt;ссылке&lt;/a&gt;.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Генерация случайных чисел</title>
+      <link>https://peltorator.ru/try_web/post/random/</link>
+      <pubDate>Tue, 14 Sep 2021 13:26:39 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/random/</guid>
+      
+      <description>&lt;p&gt;Часто бывает так, что ваши решения задач зависят от случайных чисел. Стандартным примером будет являться декартово дерево, в котором логарифмическая высота достигается в том случае, если потенциалы будут выбраны случайно. Когда ваша программа использует случайные числа, нужно быть внимательным, чтобы не попасть в какую-нибудь ловушку. В этом разделе мы как раз поговорим про то, какие бывают ловушки, как в них не попасться, а также как упростить себе жизнь. В основном речь будет идти про C++, однако некоторые вещи можно по аналогии перенести в другие языки.&lt;/p&gt;
+&lt;h2 id=&#34;mt19937&#34;&gt;mt19937&lt;/h2&gt;
+&lt;p&gt;Первое, что нужно сделать, когда вы работаете со случайными числами, — это забыть про функцию &lt;code&gt;rand&lt;/code&gt;. Не стоит использовать ее ни-ко-гда! И на это есть три причины.&lt;/p&gt;
+&lt;p&gt;Первая причина заключается в том, что случайные числа, которые генерирует &lt;code&gt;rand&lt;/code&gt;, — это &amp;laquo;плохие&amp;raquo; случайные числа. Дело в том, что компьютер не может сгенерировать по настоящему случайные числа. Поэтому вместо этого он генерирует &amp;laquo;псевдослучайные&amp;raquo; числа. Существуют разные способы генерации псевдослучайных чисел, и способ, который используется в &lt;code&gt;rand&lt;/code&gt; далеко не самый лучший. В них легко можно вычленить периодичности и т.п.&lt;/p&gt;
+&lt;p&gt;Вторая причина более обозрима. Она заключается в том, что эта функция платформозависима. По стандарту она генерирует случайное число от нуля до &lt;code&gt;RAND_MAX&lt;/code&gt;. Проблема заключается в том, что в linux это число &lt;code&gt;RAND_MAX&lt;/code&gt; совпадает с максимальным числом, которое может храниться в типе &lt;code&gt;int&lt;/code&gt; ($2^{31} - 1$), и все хорошо. Однако в windows &lt;code&gt;RAND_MAX&lt;/code&gt; равен $32767$ ($2^{15} - 1$), а это на самом деле очень маленькое число. Если вы не знаете этого и хотите генерировать много случайных чисел, они будут очень часто повторяться в таком случае. Другая проблема встает тогда, когда вам нужно генерировать действительно большие числа. В этом случае с функцией &lt;code&gt;rand&lt;/code&gt; придется изворачиваться и использовать конструкции типа &lt;code&gt;RAND_MAX * rand() + rand()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;И самое ужасное произойдет в тот момент, когда вы захотите использовать функцию &lt;code&gt;random_shuffle&lt;/code&gt;, которая случайным образом перемешивает элементы массива. Для ее работы нужна генерация случайных индексов массива, то есть случайных чисел от $0$ до $n - 1$, однако число $n$ вполне вероятно может быть сильно больше, чем $32767$. В таком случае сгенерированная перестановка абсолютно не является случайной. К примеру, если $n = 3 \cdot 10^6$, тесты показывают, что каждый элемент находится в среднем на расстоянии $2 % n$ позиций от своего изначального места, хотя с теоретической точки зрения это должно быть $33 %$.&lt;/p&gt;
+&lt;p&gt;Третья причина заключается в том, что генератор случайных чисел, который мы рассмотрим далее работает просто быстрее, чем &lt;code&gt;rand&lt;/code&gt;. Подробнее мы поговорим про это позже.&lt;/p&gt;
+&lt;p&gt;Для решения всех этих проблем подойдет генератор случайных чисел &lt;code&gt;mt19937&lt;/code&gt;, добавленный в C++11. Он вне зависимости от компилятора генерирует случайные числа от $0$ до $2^{32} - 1$ (обратите внимание, что здесь генерируется случайное &lt;code&gt;unsigned int&lt;/code&gt; число). Этот генератор основан на простом числе Мерсена $2^{19937} - 1$ (его название — это как раз сокращение от его параметров: &amp;laquo;Mersenne Twister pseudo-random generator of 32-bit numbers with a state size of 19937 bits&amp;raquo;). Такой генератор намного более &amp;laquo;рандомный&amp;raquo; и его период — это как раз $2^{19937} - 1$, что является невероятно большим числом (примерно $10^{6000}$). Давайте рассмотрим пример работы этого генератора:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;n&#34;&gt;mt19937&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4321&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;cout&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;sc&#34;&gt;&amp;#39; &amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Данный код создает генератор под названием &lt;code&gt;rnd&lt;/code&gt; с начальным сидом $4321$. После этого генератор можно использовать как функцию. Данный код выведет на экран два случайных числа от $0$ до $2^{32} - 1$. Стоит обращать внимание на то, что если присвоить значение &lt;code&gt;rnd()&lt;/code&gt; переменной типа &lt;code&gt;int&lt;/code&gt;, то значение может быть отрицательным. Однако если вы сразу знаете, что вам нужно число из какого-то диапазона, то взяв значение по модулю вы избежите отрицательных чисел:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;rnd() % 1000&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Кроме того, этот генератор можно использовать при перемешивании элементов массива. Для этого нужно воспользоваться функцией &lt;code&gt;std::shuffle&lt;/code&gt;, аналогичной &lt;code&gt;random_shuffle&lt;/code&gt;. Она принимает начало и конец последовательности, а также генератор. К примеру:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;shuffle(a.begin(), a.end(), rnd);&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Также стоит обратить внимание на то, что мы не только выигрываем в качестве генератора и величине генерируемых чисел, но и во времени. Генерация числа при помощи &lt;code&gt;rnd&lt;/code&gt; в $3$ раза быстрее генерации при помощи &lt;code&gt;rand&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Если вам нужно генерировать еще бóльшие числа, у &lt;code&gt;mt19937&lt;/code&gt; есть старший брат &lt;code&gt;mt19937_64&lt;/code&gt;, который генерирует уже  $64$-битные случайные числа.&lt;/p&gt;
+&lt;p&gt;Стоит не забывать и о платформенной независимости. &lt;code&gt;mt19937&lt;/code&gt; не только генерирует большие случайные числа на любой платформе, он кроме того генерирует одни и те же числа (при фиксированном сиде) на любой платформе. Так что вы можете быть уверены, что когда вы засылаете ваше решение в систему, оно будет там работать точно так же, как и на вашем компьютере.&lt;/p&gt;
+&lt;p&gt;Еще одним плюсом может быть то, что вы можете создавать несколько разных &lt;code&gt;mt19937&lt;/code&gt; генераторов в одной программе (с одним и тем же сидом, либо с разными) и использовать их независимо. Как это можно использовать, каждый решит для себя сам. К примеру, если вы делаете in-code стресс, вы можете не передавать решениям входные данные, сгенерированные случайно, а генерировать их прямо по ходу решения, и если вы используете один и тот же сид, но разные генераторы в двух решениях, они будут генерировать одни и те же числа.&lt;/p&gt;
+&lt;h2 id=&#34;uniform_int_distrubition&#34;&gt;uniform_int_distrubition&lt;/h2&gt;
+&lt;p&gt;В C++ помимо &lt;code&gt;mt19937&lt;/code&gt; есть большое количество удобных вспомогательных инструментов для работы со случайными числами.&lt;/p&gt;
+&lt;p&gt;Первый пример, который мы рассмотрим, — это &lt;code&gt;uniform_int_distribution&lt;/code&gt;. Это инструмент, позволяющий генерировать случайное целое число в заданном диапазоне. Легче всего понять его принцип работы на примере:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;n&#34;&gt;mt19937&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4321&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;uniform_int_distribution&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;distrib&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;cout&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;distrib&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Мы создаем объект класса &lt;code&gt;uniform_int_distribution&lt;/code&gt;. В шаблон мы передаем, какого типа должны возвращаться числа, в данном случае это &lt;code&gt;int&lt;/code&gt; (его можно опускать, потому что компилятор сам догадается о типе из типа левой и правой границы). Затем в конструктор передается два числа — левая и правая граница отрезка, в котором будут генерироваться числа. После чего для того, чтобы сгенерировать случайное число, нужно передать в &lt;code&gt;uniform_int_distribution&lt;/code&gt; наш генератор случайных чисел. В данном случае это &lt;code&gt;mt19937&lt;/code&gt;, который мы заранее определили. Такой код выведет случайное целое число от $1$ до $10$ включительно.&lt;/p&gt;
+&lt;p&gt;Стандартным способом сгенерировать число в полуинтервале от $l$ до $r$ был бы следующий код:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;uniform_distribution&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;r&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;В случае, если нужно сгенерировать случайное число от $0$ до $r$, код можно упростить, просто взяв значение &lt;code&gt;rnd()&lt;/code&gt; по модулю $r$. &lt;code&gt;uniform_int_distribution&lt;/code&gt; не только упрощает этот процесс, но и спасает вам от неожиданных проблем.&lt;/p&gt;
+&lt;p&gt;Обратите внимание, что если &lt;code&gt;rnd&lt;/code&gt; генерирует случайное число от $0$ до $C$, то &lt;code&gt;rnd() % r&lt;/code&gt; — это случайное число от $0$ до $r$ только в том случае, если $C$ делится на $r$. В противном случае остатки $0$, $1$, $\ldots$, $\left(C - 1\right) \bmod r$ будут генерироваться немного чаще, чем все остальные. Вы вряд ли как-то это сможете заметить, если $r$ — это, к примеру, $3$, однако для больших $r$ это может привести к неприятным последствиям. Пускай $r = \left\lfloor \frac{2 \cdot C}{3} \right\rfloor$. Тогда для остатков от $0$ до $\frac{r}{2}$ есть два возможных числа с такими остатками, а для остатков, больших $\frac{r}{2}$, таких чисел по одной штуке. Это значит, что маленькие остатки будут генерироваться в среднем в два раза чаще, чем большие. &lt;code&gt;uniform_int_distribution&lt;/code&gt; как раз таки помогает решить эту проблему.&lt;/p&gt;
+&lt;p&gt;Момент, который стоит все таки отметить — это то, что в отличие от &lt;code&gt;mt19937&lt;/code&gt;, &lt;code&gt;uniform_int_distribution&lt;/code&gt; все таки платформозависим. То есть при фиксированном сиде &lt;code&gt;mt19937&lt;/code&gt; могут выдаваться разные числа на разных компиляторах. Не то, чтобы это было очень серьезной проблемой, но стоит учитывать, что у вас на компьютере и в тестирующей системе могут генерироваться разные числа.&lt;/p&gt;
+&lt;h2 id=&#34;как-генерировать-случайные-числа-по-модулю&#34;&gt;Как генерировать случайные числа по модулю&lt;/h2&gt;
+&lt;p&gt;Сделаем небольшое отступление. Как мы поняли, если нам нужно генерировать случайное число из какого-то отрезка, нам в этом поможет &lt;code&gt;uniform_int_distribution&lt;/code&gt;. Однако что бы мы делали, если бы у нас его не было? Пришлось бы использовать плохой генератор, который генерирует числа неравномерно? Давайте приведем рандомизированный алгоритм, который за ожидаемое время $O(1)$ вернет нам случайный равномерно распределенный остаток по модулю $r$.&lt;/p&gt;
+&lt;p&gt;Как мы уже поняли, если $2^{32}$ делится на $r$, то все хорошо. Мы должны просто взять остаток от деления &lt;code&gt;rnd()&lt;/code&gt; на $r$. Однако если $r$ не является степенью двойки, распределение такого остатка будет неравномерным. Давайте избавимся от этих последних остатков, которые мешают равномерности. То есть возьмем число $X$, равное $2^{32} - (2^{32} \bmod r)$. Такое число будет делиться на $r$, но при этом будет не меньше $2^{31}$ (если $r \ge 2^{31}$, то такое число не меньше $r$, которое не меньше $2^{31}$, а если $r &amp;lt; 2^{31}$, то мы вычтем что-то меньшее $2^{31}$, поэтому получим число, которое не меньше $2^{31}$). Тогда давайте сделаем так: если случайно сгенерированное число $q$ меньше $X$, то вернем $q \bmod r$, что будет равномерно распределенным случайным остатком, а если $q$ не меньше $X$, то повторим генерацию заново. Так как $X$ не меньше $\frac{2^{32}}{2}$, то вероятность успеха каждый раз не меньше $\frac{1}{2}$, поэтому нам в среднем понадобится сгенерировать не больше двух случайных чисел.&lt;/p&gt;
+&lt;h2 id=&#34;другие-распределения&#34;&gt;Другие распределения&lt;/h2&gt;
+&lt;p&gt;По аналогии с &lt;code&gt;uniform_int_distribution&lt;/code&gt; в C++ есть много других распределений. К примеру, &lt;code&gt;normal_distribution&lt;/code&gt; и &lt;code&gt;exponential_distribution&lt;/code&gt;, которые соответствуют нормальному и экспоненциальному распределениям. Маловероятно, что это может понадобиться вам при решении задач, но все же.&lt;/p&gt;
+&lt;p&gt;А вот что действительно может понадобиться вам, так это генерировать случайное вещественное число. Для этого подойдет &lt;code&gt;uniform_real_distribution&lt;/code&gt;. Его использование аналогично &lt;code&gt;uniform_int_distribution&lt;/code&gt;, но только теперь генерируется не случайное целое число из отрезка, а случайное вещественное.&lt;/p&gt;
+&lt;h2 id=&#34;выбор-сида-рандома&#34;&gt;Выбор сида рандома&lt;/h2&gt;
+&lt;p&gt;Важным вопросом является выбор сида рандома. Формально есть всего два варианта выбора сида: детерминированный (фиксированное число) и случайный. Давайте поймем, какой вариант нужно использовать в какой ситуации.&lt;/p&gt;
+&lt;p&gt;Чаще всего (частота употребления — это, конечно, индивидуальная вещь, но все же) вы хотите использовать константный сид рандома (мы ранее использовали всегда число $4321$, но это может быть ваше любимое число). Какие у этого плюсы? В таком случае ваши случайные числа весьма условно случайны. На самом деле они вполне детерминированы. Каждый раз, когда вы запускаете программу, вам выдаются одни и те же числа. Чем же это хорошо? Тем, что вы контролируете ситуацию.&lt;/p&gt;
+&lt;p&gt;Если ваша программа не работает, и вы пытаетесь найти ошибку, вы знаете, что при каждом запуске программе даются одни и те же случайные числа, и вы не столкнетесь с тем, что один раз ошибка была, потом пропала, а воспроизвести ее не получается.&lt;/p&gt;
+&lt;p&gt;Другой плюс — это уверенность в результате. Вы знаете, что когда вы зашлете решение в систему, оно будет работать там на тестах точно так же, как и на вашем компьютере. Кроме того, если вы получили по задаче AC, то вы уверены, что сколько бы раз не происходило перетестирование, ваше решение все равно будет проходить тесты.&lt;/p&gt;
+&lt;p&gt;Если же вы используете случайный сид, то при каждом запуске числа, которые выдает ваш случайный генератор, меняются. В результате чего может сложиться такая ситуация, что после окончания контеста все решения будут перетестированы, и вам не повезет со случайными числами, в результате чего ваше решение не пройдет тесты.&lt;/p&gt;
+&lt;p&gt;В каком же случае все таки нужно использовать случайный сид (про то, как сгенерировать случайный сид, мы поговорим позже)? Во-первых, в любых контестах со взломами (codeforces, topcoder и т.п.). Если в таких соревнованиях ваш сид не случайный, то человек, который смотрит на ваш код, может запустить у себя локально ваше решение, посмотреть, какие случайные числа оно генерирует, и без труда построить контртест, тем самым вся ваша случайность будет абсолютно бесполезна.&lt;/p&gt;
+&lt;p&gt;Во-вторых, это может понадобиться вам, когда вы хотите запустить ваше решение несколько раз и проверить, что от изменения сида вывод не меняется. Это можно сделать, меняя каждый раз сид руками в коде, но после этого каждый раз придется перекомпилировать программу. Случайный сид может быть хорошим решением этой проблемы.&lt;/p&gt;
+&lt;p&gt;В-третьих, если вы пишете &lt;a href=&#34;https://peltorator.ru/try_web/try_web/post/stress/&#34;&gt;стресс тесты&lt;/a&gt;. Есть два подхода в этом плане. Первый — передавать сид как аргумент командной строки, либо выбирать его случайно. Если вы все таки решили выбрать сид случайно, то вам очень важно &amp;laquo;качество&amp;raquo; этого случайного сида. Об этом мы как раз и поговорим далее.&lt;/p&gt;
+&lt;p&gt;Случайным сидом обычно выбирают текущее время, потому что это некоторая меняющаяся величина. Самый простой способ получения времени — это &lt;code&gt;time(0)&lt;/code&gt;. Эта функция возвращает текущее время в секундах. Этот вариант подойдет вам, если вы хотите запустить ваше решение несколько раз и посмотреть, что оно делает при разных сидах (если вы запускаете ваше решение не чаще, чем раз в секунду). Однако эту функцию категорически не стоит использовать в двух других случаях.&lt;/p&gt;
+&lt;p&gt;В случае стресс тестирования вы хотите прогонять тысячи тестов в секунду, но при использовании &lt;code&gt;time(0)&lt;/code&gt; ваш генератор целую секунду будет генерировать вам один и тот же тест, поэтому поиск неправильного теста замедляется в тысячи раз.&lt;/p&gt;
+&lt;p&gt;В случае взломов проблема не так очевидна. На самом деле человек, который вас взламывает, может подгадать, в какую секунду ваше решение будет тестироваться и подготовить тест специально для нее. Если этот вариант кажется вам невозможным, то есть и более реалистичный случай. Можно сделать тест, который является контртестом сразу к $60$ разным сидам. И если эти сиды — это последовательные секунды, то здесь для взлома остается лишь совершить его в правильную минуту, что совершенно не является проблемой.&lt;/p&gt;
+&lt;p&gt;Что же делать? Нужно использовать время в наносекундах (миллиардная доля секунды). Тогда подгадать сид точно уже не представляется возможным. Получить текущее время в наносекундах можно при помощи следующей строки:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;chrono::steady_clock::now().time_since_epoch().count()&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;И это можно использовать как сид рандома:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Есть еще способ через &lt;code&gt;random_device&lt;/code&gt;. Это генератор случайных чисел, который недетерминирован сам по себе:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;n&#34;&gt;random_device&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;mt19937&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;rnd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rd&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;());&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Однако, к сожалению, это тоже платформозависимое решение&lt;/strong&gt;. На windows &lt;code&gt;random_device&lt;/code&gt; все таки детерминирован, поэтому этот способ не рекомендуется использовать.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Поиск пересечения полуплоскостей с точкой внутри</title>
+      <link>https://peltorator.ru/try_web/post/halfplanes_intersection_point_inside/</link>
+      <pubDate>Tue, 14 Sep 2021 13:12:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/halfplanes_intersection_point_inside/</guid>
+      
+      <description>&lt;p&gt;Алгоритмы нахождения пересечения полуплоскостей достаточно сложные, поэтому стоит пользоваться ситуациями, когда задачу нужно решать не в общем случае. К примеру, если все полуплоскости &amp;laquo;смотрят вниз&amp;raquo;, то это уже задача Convex Hull Trick. Если нужно лишь проверить пересечение полуплоскостей на непустоту, то это можно сделать при помощи линейного &lt;a href=&#34;https://peltorator.ru/try_web/try_web/post/halfplanes_intersection_linear/&#34;&gt;рандомизированного алгоритма&lt;/a&gt;. В этой главе же мы рассмотрим ситуацию, когда нам известно, что какая-то точка $P$ обязательно лежит строго внутри пересечения полуплоскостей.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Обратите внимание, что точка должна лежать строго внутри, поэтому нельзя просто сначала найти точку на границе при помощи рандомизированного линейного алгоритма, а потом запустить алгоритм из этой главы.&lt;/p&gt;
+&lt;p&gt;Пусть точка $P$ лежит в пересечении полуплоскостей. Тогда давайте сначала переместим точку $P$ в начало координат. Все полуплоскости тоже сдвинем на вектор $-P$. Теперь начало координат лежит в пересечении полуплоскостей. Давайте все прямые вида $ax + by + c = 0$ заменим на точки $\left( \frac{a}{c}, \frac{b}{c} \right)$. Теперь мы перешли к двойственной задаче, и у полученного набора точек нужно найти выпуклую оболочку, что уже намного проще. После этого мы найдем список индексов прямых, которые образуют пересечение полуплоскостей.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Минимальная покрывающая окружность за $O(n)$</title>
+      <link>https://peltorator.ru/try_web/post/min_circle/</link>
+      <pubDate>Tue, 14 Sep 2021 13:10:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/min_circle/</guid>
+      
+      <description>&lt;p&gt;Решим за линейное время следующую задачу:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Задача:&lt;/strong&gt;
+Даны $n$ точек на плоскости. Требуется найти окружность минимального радиуса, такую что все данные точки лежат внутри или на границе этой окружности.&lt;/p&gt;
+&lt;p&gt;В отличие от других рассмотренных рандомизированных геометрических алгоритмов, у которых есть общеизвестные детерминированные аналоги, работающие в $\log n$ раз дольше, в данном случае рандомизированное решение будет единственным применимым с практической точки зрения.&lt;/p&gt;
+&lt;p&gt;Есть два варианта того, как будет выглядеть минимальная покрывающая окружность: либо это описанная окружность какой-то тройки из данных точек, либо окружность, построенная на отрезке между двумя какими-то точками как на диаметре, потому что во всех других случаях ее радиус можно немного уменьшить так, чтобы эта окружность все еще содержала в себе все данные точки.&lt;/p&gt;
+&lt;script type=&#34;text/tikz&#34;&gt;
+\definecolor{ududff}{rgb}{0.30196078431372547,0.30196078431372547,1.}
+
+\begin{tikzpicture}[line cap=round,line join=round,x=1.0cm,y=1.0cm]
+%\clip(1.9532993692172027,-5.315606491485562) rectangle (22.418083000629153,7.063910164237411);
+\draw [line width=2.pt] (6.945547737616033,-1.3701101896033616) circle (2.15982720768932cm);
+\draw [line width=2.pt] (12.353435313049506,-1.4407171317673966) circle (2.261063915530779cm);
+\begin{scriptsize}
+\draw [fill=ududff] (5.291407518931119,0.018656782931653123) circle (2.5pt);
+\draw [fill=ududff] (9.01532716333559,-0.7529662064494537) circle (2.5pt);
+\draw [fill=ududff] (5.9,-3.26) circle (2.5pt);
+\draw [fill=ududff] (10.474701078034638,-0.18263617081993994) circle (2.5pt);
+\draw [fill=ududff] (14.232169548064373,-2.6987980927148527) circle (2.0pt);
+\end{scriptsize}
+\end{tikzpicture}
+&lt;/script&gt;
+&lt;p&gt;Давайте по очереди добавлять точки в случайном порядке, поддерживая минимальную покрывающую окружность текущего набора точек. Если новая точка лежит внутри текущей окружности, то ничего менять не надо, а в противном случае нужно перестроить окружность. Стоит заметить, что если новая точка не лежит в старой окружности, то она обязана лежать на новой минимальной окружности. На окружности лежит $3$ точки, поэтому вероятность такого события — $\frac{3}{k}$, где $k$ — индекс новой точки (если на окружности лежит больше $3$ точек, то эта окружность была минимальной еще до добавления текущей точки, а если окружность построена на двух точках как на диаметре, то вероятность еще меньше — $\frac{2}{k}$). Теперь если мы построим линейный алгоритм, который находит минимальную покрывающую окружность, проходящую через новую точку, то итоговая асимптотика алгоритма будет $\sum_{k = 1}^{n} \frac{3}{k} \cdot k = \sum_{k = 1}^{n} 3 = 3n = O(n)$.&lt;/p&gt;
+&lt;script type=&#34;text/tikz&#34;&gt;
+\begin{tikzpicture}[line cap=round,line join=round,x=1.0cm,y=1.0cm]
+%\clip(0.5970946385918617,-5.021501998660121) rectangle (14.329747363302438,3.2856272725172593);
+\draw [line width=2.pt] (7.309601593625497,-1.3147011952191234) circle (3.194715623859915cm);
+\begin{scriptsize}
+\draw [fill=ududff] (7.3,1.88) circle (2.5pt);
+\draw [fill=ududff] (4.24,-2.2) circle (2.5pt);
+\draw [fill=ududff] (10.26,-2.54) circle (2.5pt);
+\draw [fill=ududff] (7.58,0.24) circle (2.5pt);
+\draw [fill=ududff] (6.08,-0.84) circle (2.5pt);
+\draw [fill=ududff] (8.52,-3.54) circle (2.5pt);
+\draw [fill=ududff] (8.92,-0.76) circle (2.5pt);
+\draw [fill=ududff] (6.4,-2.92) circle (2.5pt);
+\draw [fill=red] (4.08,0.79) circle (2.5pt);
+\end{scriptsize}
+\end{tikzpicture}
+&lt;/script&gt;
+&lt;p&gt;Алгоритм нахождения минимальной покрывающей окружности, проходящей через новую точку аналогичен алгоритму, который мы только что рассмотрели. Мы перебираем все остальные точки в случайном порядке, и если новая точка лежит вне текущей окружности, то эту окружность нужно перестроить. Вероятность того, что новая точка лежит на минимальной окружности не больше $\frac{2}{k}$, поэтому алгоритм будет линейным.&lt;/p&gt;
+&lt;p&gt;Остается последний этап: зафиксированы уже две точки и нужно построить минимальную покрывающую окружность, проходящую через них. Алгоритм аналогичен. Начинаем с окружности, построенной на отрезке между этими двумя точками как на диаметре, а затем добавляем остальные точки в случайном порядке. Вероятность, что окружность нужно перестроить не больше $\frac{1}{k}$, при этом если зафиксированы уже три точки на окружности, то окружность определяется однозначно.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Проверка пересечения полуплоскостей на непустоту за $O(n)$</title>
+      <link>https://peltorator.ru/try_web/post/halfplanes_intersection_linear/</link>
+      <pubDate>Tue, 14 Sep 2021 13:04:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/halfplanes_intersection_linear/</guid>
+      
+      <description>&lt;p&gt;Решим за линейное время следующую задачу:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Задача:&lt;/strong&gt;
+Даны $n$ полуплоскостей. Требуется найти точку, лежащую во всех этих полуплоскостях, либо сказать, что такой нет.&lt;/p&gt;
+&lt;p&gt;Задачу пересечения полуплоскостей можно решить за время $O(n \log n)$ различными способами. Они находят не только одну точку, но все множество пересечения.
+Мы же рассмотрим рандомизированный алгоритм, работающий за ожидаемое время $O(n)$.&lt;/p&gt;
+&lt;p&gt;Давайте будем добавлять полуплоскости по одной в случайном порядке, поддерживая самую высокую точку в множестве пересечения уже добавленных полуплоскостей (Если таких точек несколько, то самую левую из них. При этом изначально ограничим все квадратом $[-10^9, 10^9] \times [-10^9, 10^9]$ при помощи четырех полуплоскостей, чтобы не было проблем с тем, что эта точка бесконечно удалена).&lt;/p&gt;
+&lt;script type=&#34;text/tikz&#34;&gt;
+\definecolor{zzttqq}{rgb}{0.6,0.2,0.}
+
+\begin{tikzpicture}[line cap=round,line join=round,x=1.0cm,y=1.0cm]
+%\clip(-4.3,-8.46) rectangle (20.1,6.3);
+\fill[line width=2.pt,color=zzttqq,fill=zzttqq,fill opacity=0.10000000149011612] (1.,-0.58) -- (5.746558852614512,3.8050659598657246) -- (7.395232164677132,3.2526971519879693) -- (9.412625948614792,0.253291579043614) -- (3.82,-4.) -- (1.,-4.) -- cycle;
+\draw [line width=2.pt] (1.,5.)-- (1.,-4.);
+\draw [line width=2.pt] (1.,-4.)-- (10.,-4.);
+\draw [line width=2.pt] (10.,-4.)-- (10.,5.);
+\draw [line width=2.pt] (10.,5.)-- (1.,5.);
+\draw [line width=2.pt] (7.04,5.)-- (1.,-0.58);
+\draw [line width=2.pt] (2.18,5.)-- (10.,2.38);
+\draw [line width=2.pt] (6.22,5.)-- (10.,-0.62);
+\draw [line width=2.pt] (10.,0.7)-- (3.82,-4.);
+\draw [line width=2.pt,color=zzttqq] (1.,-0.58)-- (5.746558852614512,3.8050659598657246);
+\draw [line width=2.pt,color=zzttqq] (5.746558852614512,3.8050659598657246)-- (7.395232164677132,3.2526971519879693);
+\draw [line width=2.pt,color=zzttqq] (7.395232164677132,3.2526971519879693)-- (9.412625948614792,0.253291579043614);
+\draw [line width=2.pt,color=zzttqq] (9.412625948614792,0.253291579043614)-- (3.82,-4.);
+\draw [line width=2.pt,color=zzttqq] (3.82,-4.)-- (1.,-4.);
+\draw [line width=2.pt,color=zzttqq] (1.,-4.)-- (1.,-0.58);
+\begin{scriptsize}
+\draw [fill=yellow] (5.746558852614512,3.8050659598657246) circle (2.0pt);
+\end{scriptsize}
+\end{tikzpicture}
+&lt;/script&gt;
+&lt;p&gt;Тогда если при добавлении новой полуплоскости эта точка лежит в очередной полуплоскости, то ничего не поменяется, потому что множество пересечения могло только уменьшиться, но при этом его верхняя точка сохранилась.&lt;/p&gt;
+&lt;p&gt;Если же эта точка не лежит в новой полуплоскости, то придется заново искать самую верхнюю точку. Заметим, что эта новая точка обязана лежать на прямой, высекающей новую полуплоскость. То есть нам надо найти самую высокую точку на прямой, лежащую в пересечении полуплоскостей. Но ведь все остальные полуплоскости высекают на этой прямой какие-то лучи. Поэтому нам надо найти самую высокую точку в пересечении лучей. Для этого надо отдельно посмотреть на все лучи, смотрящие вниз, и взять из них самый нижний (начинается в точке $A$). Аналогично взять все лучи, смотрящие вверх, и взять из них самый верхний. Проверить, что эти два луча пересекаются, и в таком случае взять точку $A$. Это можно сделать за линейное время.&lt;/p&gt;
+&lt;script type=&#34;text/tikz&#34;&gt;
+\definecolor{ffxfqq}{rgb}{1.,0.4980392156862745,0.}
+\definecolor{ffffqq}{rgb}{1.,1.,0.}
+\definecolor{ffccww}{rgb}{1.,0.8,0.4}
+
+\begin{tikzpicture}[line cap=round,line join=round,x=1.0cm,y=1.0cm]
+%\clip(-4.3,-7.32) rectangle (20.1,7.44);
+\draw [line width=2.pt,color=ffccww] (1.,4.)-- (10.,-4.);
+\draw [line width=2.pt] (8.72,2.6)-- (-0.84,1.92);
+\draw [line width=2.pt] (-1.3,-0.58)-- (8.34,3.3);
+\draw [line width=2.pt] (-1.94,0.42)-- (5.36,4.76);
+\draw [line width=2.pt] (8.62,3.96)-- (7.36,-4.44);
+\draw [line width=2.pt] (4.92,-4.18)-- (11.36,-0.7);
+\draw [line width=2.pt] (9.78,1.3)-- (4.28,-3.98);
+\draw [line width=2.pt,color=ffxfqq] (3.8297465191003215,1.4846697607997144)-- (7.019182692307692,-1.350384615384615);
+\begin{scriptsize}
+\draw [fill=ffffqq] (3.8297465191003215,1.4846697607997144) circle (2.0pt);
+\end{scriptsize}
+\end{tikzpicture}
+&lt;/script&gt;
+&lt;p&gt;Почему этот алгоритм работает за линейное время? Доказывается это точно так же, как и для поиска двух ближайших точек на плоскости. Самая верхняя левая точка лежит на пересечении двух прямых, высекающих полуплоскости. Тогда вероятность того, что случайно выбранная прямая лежит на краю равна $\frac{2}{k}$. Асимптотика алгоритма равна $\sum_{k = 1}^{n} k \cdot \frac{2}{k} = \sum_{k = 1}^{n} 2 = 2n = O(n)$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Если больше, чем две полуплоскости, пересекаются в одной точке, то легко заметить, что вероятность от этого становится только меньше. Либо эта точка и раньше уже была самой верхней левой, либо же вероятность правильно выбрать нужную прямую не больше $\frac{2}{k}$.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Поиск пары ближайших точек за $O(n)$</title>
+      <link>https://peltorator.ru/try_web/post/closest_points_linear/</link>
+      <pubDate>Tue, 14 Sep 2021 12:41:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/closest_points_linear/</guid>
+      
+      <description>&lt;p&gt;Решим за линейное время следующую задачу:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Задача:&lt;/strong&gt;
+Даны $n$ точек на плоскости. Требуется найти такую пару точек, что расстояние между ними минимально среди всех расстояний между всеми парами данных точек.&lt;/p&gt;
+&lt;p&gt;У этой задачи есть детерминированный алгоритм, основанный на идее &amp;laquo;разделяй и властвуй&amp;raquo;, работающий за $O(n \log n)$.
+Мы же рассмотрим рандомизированный алгоритм, работающий за ожидаемое время $O(n)$.&lt;/p&gt;
+&lt;p&gt;Давайте будем постепенно добавлять точки по одной в случайном порядке, поддерживая пару ближайших точек. Пусть на данный момент уже было добавлено сколько-то точек, и текущее минимальное расстояние равно $d$. Побьем всю плоскость на квадраты $d \times d$ и для каждого квадрата в хеш-таблице будем хранить все точки, находящиеся в этом квадрате. При этом можно заметить, что так как на данный момент минимальное расстояние между точками равно $d$, то расстояние между любой парой точек не меньше $d$, поэтому в каждом квадрате не больше $4$ точек.&lt;/p&gt;
+&lt;script type=&#34;text/tikz&#34;&gt;
+\begin{tikzpicture}[line cap=round,line join=round,x=1.0cm,y=1.0cm]
+\draw [line width=2.pt] (0.,3.)-- (0.,-3.);
+\draw [line width=2.pt] (2.5,3.)-- (2.5,-3.);
+\draw [line width=2.pt] (5.,3.)-- (5.,-3.);
+\draw [line width=2.pt] (7.5,3.)-- (7.5,-3.);
+\draw [line width=2.pt] (-0.5,2.5)-- (8.,2.5);
+\draw [line width=2.pt] (8.,0.)-- (-0.5,0.);
+\draw [line width=2.pt] (-0.5,-2.5)-- (8.,-2.5);
+\begin{scriptsize}
+\draw [fill=blue] (5.,0.) circle (2.5pt);
+\draw [fill=blue] (5.,-2.5) circle (2.5pt);
+\draw [fill=blue] (7.5,-2.5) circle (2.5pt);
+\draw [fill=blue] (7.5,0.) circle (2.5pt);
+\draw [fill=blue] (1.2,2.32) circle (2.5pt);
+\draw [fill=blue] (0.14,0.22) circle (2.5pt);
+\draw [fill=blue] (2.14,0.32) circle (2.5pt);
+\draw [fill=blue] (3.82,2.24) circle (2.5pt);
+\draw [fill=blue] (6.72,2.26) circle (2.5pt);
+\draw [fill=blue] (2.84,-1.1) circle (2.5pt);
+\draw [fill=blue] (0.22,-2.25) circle (2.5pt);
+\end{scriptsize}
+\end{tikzpicture}
+&lt;/script&gt;
+&lt;p&gt;Заметим, что если мы добавляем какую-то новую точку, то если минимальное расстояние изменилось, то есть какая-то точка, которая находится на расстоянии меньше $d$ от новой точки. При этом обратим внимание на то, что эта точка должна находиться либо в том же квадрате $d \times d$, либо в соседнем (по стороне или диагонали), ведь если нарисовать круг радиуса $d$ с центром в новой точке, он целиком будет лежать в квадрате $3d \times 3d$, в центральном квадрате которого лежит новая точка.&lt;/p&gt;
+&lt;script type=&#34;text/tikz&#34;&gt;
+\definecolor{xdxdff}{rgb}{0.49019607843137253,0.49019607843137253,1.}
+\definecolor{ffzzqq}{rgb}{1.,0.6,0.}
+\definecolor{ududff}{rgb}{0.30196078431372547,0.30196078431372547,1.}
+
+\begin{tikzpicture}[line cap=round,line join=round,x=1.0cm,y=1.0cm]
+%\clip(-2.3879877682440735,-6.345539414293429) rectangle (16.523412413538978,5.094307580916252);
+\draw [line width=2.pt] (0.,2.5)-- (0.,-5.);
+\draw [line width=2.pt] (0.,-5.)-- (7.5,-5.);
+\draw [line width=2.pt] (7.5,-5.)-- (7.5,2.5);
+\draw [line width=2.pt] (7.5,2.5)-- (0.,2.5);
+\draw [line width=2.pt] (0.,0.)-- (7.5,0.);
+\draw [line width=2.pt] (7.5,-2.5)-- (0.,-2.5);
+\draw [line width=2.pt] (2.56,2.54)-- (2.5,-5.);
+\draw [line width=2.pt] (5.,2.5)-- (5.,-5.);
+\draw [line width=2.pt,color=ffzzqq] (3.3,-0.75) circle (2.5068905041903986cm);
+\draw [line width=2.4pt] (3.3,-0.75)-- (4.166189323170816,1.602491457248012);
+\begin{scriptsize}
+\draw [fill=ududff] (3.3,-0.75) circle (2.5pt);
+\draw [fill=xdxdff] (4.166189323170816,1.602491457248012) circle (2.5pt);
+\end{scriptsize}
+\end{tikzpicture}
+&lt;/script&gt;
+&lt;p&gt;Так как в каждом квадрате лежит не больше $4$ точек, нам придется перебрать не более $9 \cdot 4 = 36$ точек в поиске пары для новой точки. То есть добавление новой точки будет происходить за константное время. Однако если мы все таки нашли новую пару, то нам придется перестроить всю структуру квадратов, потому что $d$ уменьшится.&lt;/p&gt;
+&lt;p&gt;Кажется, что такой алгоритм будет работать за квадратичное время, однако вспомним, что мы добавляем точки в случайном порядке! Заметим, что если мы перестроили структуру после добавления $k$-й точки, то это одна из двух точек в паре самых близких. Так как эта точка была выбрана случайно, то вероятность такого события — $\frac{2}{k}$ (если есть несколько одинаковых минимальных расстояний, то либо до добавления этой точки расстояние уже было таким, и ничего перестраивать не надо, либо же во всех таких минимальных расстояниях одной из точек является наша новая точка, и тогда вероятность еще меньше — $\frac{1}{k}$). Если это событие произошло, то нам нужно перестроить заново структуру. Это происходит за $O(k)$. Поэтому ожидаемое время работы равно $\sum_{k = 1}^{n} \frac{2}{k} \cdot k = \sum_{k = 1}^{n} 2 = 2n = O(n)$. Что и требовалось доказать.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Если координаты точек целые, то в алгоритме можно обойтись без вещественных чисел. Вместо минимального расстояния будем хранить его квадрат, а делить на квадраты будем со стороной не $d$, а $\left\lfloor d \right\rfloor$. Очевидно, от этого асимптотика не поменяется.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Чтобы получить номер квадрата, в котором находится точка, вы скорее всего будете делить его координаты на $d$. Будьте внимательны, что если в множестве есть совпадающие точки, то $d$ может стать равно нулю. В этом случае нужно сразу завершиться, потому что более близких точек точно уже не будет.&lt;/p&gt;
+&lt;p&gt;С реализацией можно ознакомиться по &lt;a href=&#34;https://pastebin.com/zwSY4tHq&#34;&gt;ссылке&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Легко обобщить этот алгоритм для бóльших размерностей. Нужно побить пространство на кубы со стороной $d$ и искать пару для новой точки во всех соседних кубах. Для фиксированной размерности алгоритм будет все еще линейным.&lt;/p&gt;
+&lt;h2 id=&#34;задачи-для-практики&#34;&gt;Задачи для практики&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://codeforces.com/contest/120/problem/J&#34;&gt;https://codeforces.com/contest/120/problem/J&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Дискретное логарифмирование</title>
+      <link>https://peltorator.ru/try_web/post/discrete_log/</link>
+      <pubDate>Tue, 14 Sep 2021 12:35:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/discrete_log/</guid>
+      
+      <description>&lt;p&gt;Даны числа $a$, $b$ и $m$. Необходимо найти такой $x$, что $a^x = b \mod m$. При этом $gcd(a, m) = 1$, но $m$ не обязано быть простым.&lt;/p&gt;
+&lt;p&gt;Ответ есть не всегда, к примеру, при $a = 1$ и $b \neq 1$.&lt;/p&gt;
+&lt;p&gt;Сделаем корневую декомпозицию. Известно, что $x \in [0, m - 1]$. Пусть $k = \left\lfloor \sqrt{m} \right\rfloor$. Посчитаем числа вида $a^{k n}$ для $0 \le n \le \left\lceil \sqrt{m} \right\rceil $ и положим их в &lt;code&gt;unordered_map&lt;/code&gt;. Пусть ответ — это $x$. $x = ki - j$, где $0 \le j &amp;lt; k$.&lt;/p&gt;
+&lt;p&gt;Тогда равенство можно записать как $a^{ki} = b \cdot a^j \mod p$. Числа слева у нас сохранены. Осталось последовательно домножать $b$ на $a$, пока такое число не попадется среди сохраненных.&lt;/p&gt;
+&lt;p&gt;Получается асимптотика $O(\sqrt{m})$.&lt;/p&gt;
+&lt;p&gt;Это хорошо, но на выполнение $n$ запросов уйдет $O(n \sqrt{m})$ времени.&lt;/p&gt;
+&lt;p&gt;Давайте делать лучше. Пусть $m$ — это $2$, $4$, $p^k$ или $2 \cdot p^k$. Найдем заранее $g$ — первообразный корень по модулю $m$ (он как раз существует ровно для таких $m$) и число $\varphi(m)$. Это можно сделать за $\sqrt{m}$. Затем вместо нахождения логарифма $b$ с основанием $a$, мы будем искать логарифмы обоих чисел по основанию $g$, а потом их надо будет просто поделить друг на друга по модулю $\varphi(m)$.&lt;/p&gt;
+&lt;p&gt;Заметим, что если мы всегда логарифмируем с фиксированным основанием, то первый шаг, на котором мы насчитываем все числа вида $g^{kn}$ можно не выполнять каждый раз, а только один раз в самом начале. Тогда можно взять $k \neq \sqrt{m}$.&lt;/p&gt;
+&lt;p&gt;Первая фаза работает за $m / k$ и выполняется один раз. Тогда фаза подсчета работает за $O(k)$. Асимптотика — $O(m/k + nk)$. Возьмем $m/k = nk$ для оптимальной асимптотики. $k = \sqrt{m/n}$. Время работы $O(\sqrt{mn} + n \log m)$.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Квадратный корень по простому модулю за $O(\log p)$</title>
+      <link>https://peltorator.ru/try_web/post/square_root_mod/</link>
+      <pubDate>Tue, 14 Sep 2021 12:32:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/square_root_mod/</guid>
+      
+      <description>&lt;p&gt;Задача формулируется следующим образом.
+Даны числа $a$ и $p$. При этом $p$ — простое. Нужно найти такое $z$, что $z^2 \bmod p = a$ или сказать, что такого $z$ не существует.&lt;/p&gt;
+&lt;p&gt;Давайте опишем алгоритм.&lt;/p&gt;
+&lt;p&gt;Если $p = 2$ или $a = 0$, то $z = a$.&lt;/p&gt;
+&lt;p&gt;Иначе $p \ge 3$, $a \ge 1$.&lt;/p&gt;
+&lt;p&gt;Если $a^{(p-1)/2} \neq 1 \mod p$,  то ответа не существует. Иначе же ответ есть.&lt;/p&gt;
+&lt;p&gt;Запускаем бесконечный цикл, пока не найдем ответ. В нем выбираем $i$ случайным образом из чисел $1, 2, \ldots, p - 1$. Считаем многочлен $T(x)  := (x+i)^{(p-1)/2} - 1 \mod (x^2 - a) = bx + c$ бинарным возведением в степень и взятием по модулю каждый раз.&lt;/p&gt;
+&lt;p&gt;После чего если $b \neq 0$, то возьмем $z&#39; = c/b = c \cdot b^{p - 2} \mod p$ и проверим, подходит ли оно (возведем в квадрат). Если подходит, вернем, иначе продолжаем перебирать $i$.&lt;/p&gt;
+&lt;p&gt;Почему этот алгоритм работает?
+Крайние случаи очевидны. Иначе, числа, у которых есть корень, называются квадратичными вычетами. Давайте заметим, что у каждого числа ровно $2$ корня, либо ровно $0$ (если есть корень, то подходит и минус корень, а больше быть не может, потому что $z^2 = t^2 \mod p$ решается только так). То есть у нас есть ровно $(p-1)/2$ чисел, являющихся квадратичными вычетами и $(p-1)/2$, не являющихся.
+$x^{p-1} = 1 \mod p$, так что для проверки, является ли $a$ квадратом, можно возвести в $(p-1)/2$ степень. То есть проверка на несуществование ответа верная. Теперь осталось его найти!&lt;/p&gt;
+&lt;p&gt;Пусть $z^2 = a \mod p$.
+Корни многочлена $x^2 - a$ — это как раз $z$ и $-z$.&lt;/p&gt;
+&lt;p&gt;В каком случае они будут являться корнями многочлена $T$? Если $z + i$ и $-z + i$ являются квадратичными вычетами. Нас интересует ситуация, когда ровно один из них — квадратичный вычет. Пусть это $z + i$. Тогда $z$ — корень обоих многочленов, так что после взятия по модулю ответ делится на $x - z$. При этом ответ — многочлен не более, чем первой степени. Так что он имеет вид $dx - dz$. Тогда если мы поделим коэффициенты, то получим как раз $z$. Аналогично, если $-z$ — корень обоих многочленов. Обратите внимание, что $d \neq 0$, потому что в этом случае оба числа $\pm z$ являются корнями.&lt;/p&gt;
+&lt;p&gt;Осталось понять, почему этот алгоритм будет работать быстро. Итерация работает за $O(\log p)$. Докажем, что вероятность успеха — $1/2$, тогда матожидание количества шагов будет равно двум.&lt;/p&gt;
+&lt;p&gt;Если ровно одно из чисел $z + i$ и $-z + i$ является квадратичным вычетом, то $(z + i)^{(p-1)/2} \neq (-z + i)^{(p-1)/2} \mod p$. При этом одно из этих чисел — $1$, а другое — $-1$.
+Поделим одну часть на другую. $((z+i)/(-z+i))^{(p-1)/2} = -1 \mod p$. То есть это верно, если отношение — не вычет. Докажем, что все такие числа вида $(z+i)/(-z+i)$ различны для всех $i$, тогда это будет как раз биекция во все вычеты, так что вероятность равна $1/2$.&lt;/p&gt;
+&lt;p&gt;Пусть $(z +i)/(-z+i) = (z+j)/(-z+j) \mod p$. Домножим на знаменатели, сократим, получим, что $2iz = 2jz \mod p$, то есть $i = j \mod p$.&lt;/p&gt;
+&lt;p&gt;Вероятность не совсем $1/2$, потому что нужно, чтобы $z + i \neq 0$ и $-z + i \neq 0$. Так что нам не подходят еще два вычета. Алгоритм от этого не страдает, просто для малых $p$ вероятность становится чуть меньше. Можно доказать, что для $p = 3$ все равно все работает.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Сумма мультипликативной функции: Powerful Number Sieve</title>
+      <link>https://peltorator.ru/try_web/post/powerful_number_sieve/</link>
+      <pubDate>Tue, 14 Sep 2021 12:04:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/powerful_number_sieve/</guid>
+      
+      <description>&lt;p&gt;&lt;strong&gt;Автор статьи: Александр Голованов&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Задача:&lt;/strong&gt;
+Дана мультипликативная функция $f(n)$, а также число $N$. Необходимо посчитать $s_f(N) = \sum_{k=1}^Nf(k)$.&lt;/p&gt;
+&lt;p&gt;Мы умеем делать это за $O(n^{2/3})$, если нам известна мультипликативная функция $g$, для которой мы умеем считать $s_g$ и $s_{f*g}$ за $O(1)$ при помощи &lt;a href=&#34;https://peltorator.ru/try_web/try_web/post/mobius_convolution/&#34;&gt;обращения Мёбиуса&lt;/a&gt;. Оказывается, зачастую это можно делать быстрее, если функции обладают некоторыми дополнительными свойствами.&lt;/p&gt;
+&lt;p&gt;Пусть $g(n)$ и $h(n)$ — такие мультипликативные функции, что $f = h*g$. Тогда верна следующая лемма:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Лемма:&lt;/strong&gt;
+$$s_f(n) = \sum_{k=1}^nh(k)s_g\left(\left\lfloor\frac{n}{k}\right\rfloor\right)$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+В сумме слева есть все возможные слагаемые вида $h(k) \cdot g(l)$, где $k \cdot l \le n$. Таким образом, для фиксированного $k$ мы должны перемножить $h(k)$ со всеми такими $g(l)$, что $l \le \left\lfloor \frac{n}{k} \right\rfloor$, то есть с префиксной суммой $g$. Что и требовалось доказать.&lt;/p&gt;
+&lt;p&gt;Пускай функция $h$ такова, что $h(p) = 0$ для любого простого $p$.
+Тогда заметим, что в правой части выражения из леммы те слагаемые, в которых $k$ содержит в себе некоторый простой множитель ровно в первой степени, зануляются (из свойства функции $h$). Остальные же числа содержат каждый свой простой множитель хотя бы во второй степени. Будем называть такие числа &lt;em&gt;сильными&lt;/em&gt; (от английского &lt;em&gt;powerful&lt;/em&gt;, которое происходит от слова &lt;em&gt;power&lt;/em&gt; в значении &amp;laquo;степень&amp;raquo;).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Лемма:&lt;/strong&gt;
+Всякое сильное число $n$ можно представить в виде $a^2b^3$ для некоторых натуральных $a$ и $b$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+Для этого нужно представить каждую степень простого $p_i^{\alpha_i}$, входящую в $n$, в таком виде, а потом перемножить их. То есть надо просто представить степень $\alpha_i$ в виде $2x + 3y$. Безусловно, это можно сделать, так как $\alpha_i \ge 2$ (для четного $n$ можно взять $x = \frac{n}{2}$ и $y = 0$, а для нечетного подойдет решение $x = \frac{n - 3}{2}$ и $y = 1$).&lt;/p&gt;
+&lt;p&gt;Тогда для вычисления $s_f$ нам нужно научиться эффективно перебирать все сильные числа $k$ и суммировать $h(k) s_g\left(\left\lfloor \frac{n}{k} \right\rfloor\right)$. Будем делать это рекурсивно, перебирая простые числа по возрастанию и выбирая их в степени либо ноль, либо хотя бы два. Обратите внимание на то, что если простое число $p$ входит в разложение сильного числа $k$, то $p \le \sqrt{k} \le \sqrt{n}$, потому что каждый простой множитель входит в $k$ хотя бы во второй степени, поэтому перебирать простые мы можем только до $\sqrt{n}$.&lt;/p&gt;
+&lt;p&gt;Рассмотрим следующий алгоритм вычисления функции $s_f$:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;s_f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;bool&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;new_value&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;T&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;new_value&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;h&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;s_g&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;primes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;primes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// can&amp;#39;t multiply anymore
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;s_f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;primes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;primes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;s_f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;cur&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;primes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;];&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Здесь &lt;code&gt;primes&lt;/code&gt; — массив с простыми числами хотя бы до $\sqrt{N}$; &lt;code&gt;cur&lt;/code&gt; — текущее значение $k$, которое мы перебираем рекурсивно; &lt;code&gt;idx&lt;/code&gt; — индекс текущего простого из списка &lt;code&gt;primes&lt;/code&gt;; &lt;code&gt;new_value&lt;/code&gt; — флаг, который нужен, чтобы мы не прибавили одно и то же значение к ответу несколько раз, когда мы не берем текущее простое в разложение; а тип &lt;code&gt;T&lt;/code&gt; может быть любым типом на Ваш выбор: например, &lt;code&gt;long long&lt;/code&gt; или Ваш класс для модульной арифметики.&lt;/p&gt;
+&lt;p&gt;Легко видеть, что этот алгоритм вычисляет $s_f$, перебирая лишь сильные числа. Оценим время его работы. Будем считать, что значение функции $s_g$ в точке $n$ мы можем вычислить за время $T_{s_g}(n)$, а вычисление $h(cur)$ работает за $O(1)$ (оно может считаться на лету по мультипликативности через значения в степенях простых). Тогда&lt;/p&gt;
+&lt;p&gt;$$T_{s_f(n)} = \sum_{k\text{ is powerful}}T_{s_g}\left(\left\lfloor\frac{N}{k}\right\rfloor\right)\leq\sum_{a, b : a^2b^3\leq N}T_{s_g}\left(\frac{N}{a^2b^3}\right)\approx\int\limits_{1}^{\sqrt{N}}\int\limits_{1}^{\sqrt[3]{N/a^2}}T_{s_g}\left(\frac{N}{a^2b^3}\right)\ \mathrm{d}b\ \mathrm{d}a$$&lt;/p&gt;
+&lt;p&gt;Для простоты предположим, что $T_{s_g}(n) = n^c$, где $c &amp;gt; 1/3$. Тогда&lt;/p&gt;
+&lt;p&gt;$$
+\int\limits_{1}^{\sqrt{N}}\int\limits_{1}^{\sqrt[3]{N/a^2}}T_{s_g}\left(\frac{N}{a^2b^3}\right)\ \mathrm{d}b\ \mathrm{d}a = \int\limits_{1}^{\sqrt{N}}\int\limits_{1}^{\sqrt[3]{N/a^2}}\frac{N^c}{a^{2c}b^{3c}}\ \mathrm{d}b\ \mathrm{d}a = N^c \int\limits_{1}^{\sqrt{N}} a^{-3c} \int\limits_{1}^{\sqrt[3]{N / a^2}} b^{-3c} \ \mathrm{d}b\ \mathrm{d}a =
+$$&lt;/p&gt;
+&lt;p&gt;$$
+=  N^c \int\limits_{1}^{\sqrt{N}} a^{-2c} \cdot (3c - 1) \cdot (1 - const_1) \ \mathrm{d}a \le
+$$&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://peltorator.ru/try_web/try_web/images/powerful_number_sieve_cases.png&#34; alt=&#34;обращения Мёбиуса&#34;&gt;&lt;/p&gt;
+&lt;p&gt;$$
+\le (3c - 1)N^c\int\limits_{1}^{\sqrt{N}} a^{-2c} \  \mathrm{d}a\leq
+\begin{cases}
+(1 - 2c)(3c - 1)N^c\cdot N^{1/2 - c} = O(\sqrt{N}), &amp;amp; c &amp;lt; \frac{1}{2}, \&lt;br&gt;
+(3c - 1)N^c\ln\sqrt{N} = O(\sqrt{N}\log{n}), &amp;amp; c = \frac{1}{2}, \&lt;br&gt;
+(3c - 1)(2c - 1)N^c = O(T_{s_g}(N)), &amp;amp; c &amp;gt; \frac{1}{2}.
+\end{cases}
+$$&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;color:red&#34;&gt;TODO: Почему-то &lt;em&gt;cases&lt;/em&gt; окружение из LaTeX не отображается в Markdown&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Где $const_1$ — какое-то положительное число.&lt;/p&gt;
+&lt;p&gt;Очевидно, если $c \le 1/3$, то время работы и подавно составляет $O(\sqrt{N})$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+Если $f(n)=\mathrm{rad}(n)$, то есть $f(p_1^{\alpha_1} \cdot \ldots \cdot p_k^{\alpha_k}) = p_1p_2 \cdot \ldots \cdot p_k$, то в качестве $h(n)$ можно взять мультипликативную функцию, для которой верно $h(1) = 1$, $h(p) = 0$ и $h(p^k) = p - p^2$ для всех $k &amp;gt; 1$, а в качестве $g$ можно взять $g(n) = n$. Легко проверить, что $f = g * h$. Тогда сумма $f(n)$ на префиксе размера $N$ будет считаться за $O(\sqrt{N})$, потому что $T_{s_g}(n) = O(1)$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Как видно из примера, при поиске функций $h$ и $g$ имеет смысл подобрать их значения на степенях простых.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+При оценке времени работы мы пользовались представимостью сильных чисел в виде $a^2b^3$. Казалось бы, можно было бы написать два for-а по числам $a$ и $b$, и такой алгоритм был бы проще рекурсивного перебора сильных чисел. Однако сильные числа бывают представимы в таком виде больше, чем одним способом, поэтому при таком алгоритме придётся каким-то образом проверять числа на уникальность, что может повлиять на время работы.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Поиск факториала по простому модулю за $O(\sqrt{\min (p, n)} \log n)$</title>
+      <link>https://peltorator.ru/try_web/post/mod_factorial_fast/</link>
+      <pubDate>Mon, 13 Sep 2021 18:32:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/mod_factorial_fast/</guid>
+      
+      <description>&lt;p&gt;В прошлом разделе мы научились искать $n! \mod p$ без вхождений $p$ в факториал за $O(p \log_p n)$ или за $O(p + \log_p n)$, если заранее предпосчитать все факториалы. Однако чаще всего модуль — это число порядка $10^9$, поэтому эти алгоритмы нам не подходят. Давайте научимся искать факториал быстрее.&lt;/p&gt;
+&lt;p&gt;Давайте сначала научимся искать $n! \mod p$ за $O(\sqrt{n} \log n)$, если $n &amp;lt; p$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+В зависимости от аккуратности реализации $\log n$ может быть в какой-то степени.&lt;/p&gt;
+&lt;p&gt;Обозначим $k = \left\lfloor \sqrt{n} \right\rfloor$. Тогда мы хотим построить алгоритм за $O(k \log k)$. Пусть $n = k^2 + b$, где $b \le 2 \cdot k$. В таком случае нам достаточно посчитать $\left(k^2\right)!$, а затем за $O(k)$ домножить его на $b$ недостающих чисел.&lt;/p&gt;
+&lt;p&gt;Построим многочлен $P(x) := (kx) \cdot (kx - 1) \cdot \ldots \cdot (kx - k + 1)$. Тогда $\left(k^2\right)! = P(1) \cdot P(2) \cdot \ldots \cdot P(k)$. Введем еще один многочлен $Q(x) := P(2x) \cdot P(2x - 1)$. Получается, что $\left(k^2\right)! = Q(1) \cdot Q(2) \cdot \ldots \cdot Q\left(\frac{k}{2}\right)$, если $k$ четно, а если $k$ нечетно, то еще нужно домножить на $P(k)$, но его мы легко можем сделать за $O(k)$.&lt;/p&gt;
+&lt;p&gt;Теперь давайте рекурсивно запустимся от многочлена $Q$. Глубина рекурсии будет $\log k$. Однако проблема в том, что изначально многочлен $P$ имел степень $k$, однако многочлен $Q$ имеет степень уже $2k$, и степень будет возрастать. Но если учесть, что многочлен $Q$ нам нужно посчитать только в точках $1, 2, \ldots, \left\lfloor \frac{k}{2} \right\rfloor$, то можно взять вместо $Q$ многочлен $Q \bmod (x - 1) \cdot (x - 2) \cdot \ldots \cdot (x - \left\lfloor \frac{k}{2} \right\rfloor)$. И у такого многочлена уже степень будет $&amp;lt; \left\lfloor \frac{k}{2} \right\rfloor$.&lt;/p&gt;
+&lt;p&gt;Взятие двух многочленов по модулю можно реализовать за $O(k \log k)$. Тогда асимптотика алгоритма получается $O\left(k \log k + \frac{k}{2} \log \left( \frac{k}{2} \right) + \frac{k}{4} \log \left(\frac{k}{4} \right) + \ldots\right) = O\left(\left(k + \frac{k}{2} + \frac{k}{4} + \ldots\right) \log k\right) = O(k \log k)$. Что и требовалось.&lt;/p&gt;
+&lt;p&gt;Чтобы получить алгоритм, который работает при $n \ge p$, нужно просто применить алгоритм из предыдущего раздела, однако вычислять $b!$ с помощью нового метода. $b &amp;lt; p$, поэтому это вычисление будет работать не дольше $\sqrt{p} \log p$. Всего итераций будет $\log_p n$, так что асимптотика получается $O(\sqrt{p} \log p \cdot \log_p n) = O\left(\sqrt{p} \log p \frac{\log n}{\log p}\right) = O\left(\sqrt{p} \log n\right)$. Если объединить случаи $p &amp;lt; n$ и $p \ge n$, получается время работы $O\left(\sqrt{\min (p, n)} \log n\right)$.&lt;/p&gt;
+&lt;h2 id=&#34;задачи-для-практики&#34;&gt;Задачи для практики&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.spoj.com/problems/FACTMODP/&#34;&gt;https://www.spoj.com/problems/FACTMODP/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Поиск факториала по простому модулю</title>
+      <link>https://peltorator.ru/try_web/post/mod_factorial/</link>
+      <pubDate>Mon, 13 Sep 2021 18:25:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/mod_factorial/</guid>
+      
+      <description>&lt;p&gt;Часто в задачах бывает необходимо искать $n! \bmod p$. Обычно модуль — это большое число, а $n$ не очень большое, поэтому можно просто заранее предпосчитать все факториалы. Однако иногда бывает обратная ситуация: $p &amp;lt; n$. С первого взгляда кажется, что это бессмысленная задача: в $n!$ в таком случае входит число $p$, поэтому $n! \bmod p = 0$. Но часто нас не устраивает такой ответ, потому что нам часто нужно делить факториалы друг на друга. В этом случае мы можем получить выражения типа $\frac{0}{0}$, которое на самом деле равно чему-то ненулевому. Встает задача: посчитать $n! \bmod p$ без вхождений $p$ в $n!$ и отдельно посчитать степень вхождения $p$ в факториал, то есть представить $n!$ в виде $a \cdot p^k$, где $a$ не делится на $p$.&lt;/p&gt;
+&lt;p&gt;Пускай $\left\lfloor \frac{n}{p} \right\rfloor = k$ и $n \bmod p = b$. Тогда&lt;/p&gt;
+&lt;p&gt;$$n! = (1 \cdot 2 \cdot \ldots \cdot (p - 1)) \cdot p \cdot ((p + 1) \cdot (p + 2) \cdot \ldots \cdot (2p - 1)) \cdot (2p) \cdot \ldots \cdot (kp) \cdot ((kp + 1) \cdot \ldots \cdot (kp + b))$$&lt;/p&gt;
+&lt;p&gt;Если брать это по модулю $p$, то получится&lt;/p&gt;
+&lt;p&gt;$$(p - 1)! \cdot p \cdot (p - 1)! \cdot (2p) \cdot \ldots \cdot (p - 1)! \cdot (kp) \cdot b! = \left((p - 1)!\right)^k \cdot b! \cdot (k! \cdot p^k)$$&lt;/p&gt;
+&lt;p&gt;При этом $p^k$ мы игнорируем, потому что это вхождения $p$.&lt;/p&gt;
+&lt;p&gt;По теореме Вильсона $(p - 1)! \bmod p = -1$. Так что нам необходимо посчитать $(-1)^k \cdot b! \cdot k!$.
+При этом $b &amp;lt; p$ (это остаток от деления на $p$), так что $b!$ можно посчитать за $O(p)$, после чего рекурсивно запуститься для подсчета $k!$. Каждый раз мы делим число $n$ на $p$, так что будет всего $\log_p n = \frac{\log n}{\log p}$ итераций. Асимптотика — $O(p \log_p n)$. С другой стороны, все факториалы до $p$ можно предпосчитать заранее, и тогда асимптотика будет $O(\log_p n)$ на запрос и $O(p)$ на предпосчет.&lt;/p&gt;
+&lt;p&gt;Реализация представлена ниже:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;modFactorial&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1LL&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1LL&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;С другой стороны, если нам надо посчитать степень вхождения $p$ в факториал, это делается еще проще. Давайте для этого посчитаем количество чисел, которые делятся на $p$, на $p^2$, на $p^3$ и т.д. И тогда если число делится ровно на $p^k$, то мы учтем его как раз $k$ раз. А если заметить, что количество чисел, делящихся на $p^i$, — это $\left\lfloor \frac{n}{p^i} \right\rfloor$, то получается такой незатейливый алгоритм:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;factorialPower&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;power&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;power&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;power&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Асимптотика равна $O(\log_p n)$.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Нахождение обратных ко всем остаткам за $O(p)$</title>
+      <link>https://peltorator.ru/try_web/post/all_mod_inv/</link>
+      <pubDate>Mon, 13 Sep 2021 18:10:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/all_mod_inv/</guid>
+      
+      <description>&lt;p&gt;Часто бывает так, что в задаче нужно делить по модулю много раз. Это можно делать обычным алгоритмом взятия обратного по модулю за $O(\log p)$ на запрос. Если мы сделаем $n$ запросов, то асимптотика будет $O(n \log p)$. Сейчас мы рассмотрим алгоритм, который изначально предпосчитает обратные ко всем остаткам за $O(p)$, и тогда на запросы мы будем отвечать за $O(1)$. Если $n$ порядка $p$ или больше, то этот вариант будет более эффективен.&lt;/p&gt;
+&lt;p&gt;Есть много разных алгоритмов, которые делают это. Здесь будут представлены два, пожалуй, самых простых: один очень простой в понимании и написании, а другой еще легче в написании, однако не настолько очевидный с точки зрения понимания и придумывания.&lt;/p&gt;
+&lt;h2 id=&#34;метод-обратных-факториалов&#34;&gt;Метод обратных факториалов&lt;/h2&gt;
+&lt;p&gt;Идея первого алгоритма заключается в том, что мы посчитаем все возможные факториалы и обратные факториалы, а любое обратное к какому-то остатку представим как отношение двух факториалов.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Теорема:&lt;/strong&gt;
+Теорема Вильсона гласит, что если $p$ — простое число, то&lt;/p&gt;
+&lt;p&gt;$$
+(p - 1)! \equiv -1 \pmod p
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Давайте заметим, что все остатки от $1$ до $p - 1$ разбиваются на пары вида $x$, $x^{-1}$. Произведение чисел в паре равно единице по модулю $p$.
+Есть один крайний случай: когда $x = x^{-1}$. Это происходит в том случае, если $x^2 \equiv 1 \pmod p$, то есть
+$x^2 - 1 = (x - 1) \cdot (x + 1)\  ⋮\ p$. Значит, $x \equiv \pm 1 \pmod p$. Тогда в итоге $(p - 1)!$ по модулю $p$ состоит из произведения нескольких единиц, а также одной $-1$. Так что $(p - 1)! \equiv -1 \pmod p$. Что и требовалось доказать.&lt;/p&gt;
+&lt;p&gt;Зная этот факт, мы можем сразу понять, что $\left((p - 1)!\right)^{-1} \equiv -1 \pmod p$, потому что обратное к $-1$ — это $-1$. Таким образом, обратное к $(p - 1)!$ мы уже посчитали.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+На самом деле не обязательно было пользоваться этой формулой. Можно было посчитать за $O(p)$ число $(p - 1)!$, а потом бинарным возведением в степень найти к нему обратное за $O(\log p)$. Итоговая асимптотика бы от этого не пострадала.&lt;/p&gt;
+&lt;p&gt;Мы уже нашли обратное к $(p - 1)!$. Как же найти обратное к $(p - 2)!$ теперь?
+Заметим следующий факт:&lt;/p&gt;
+&lt;p&gt;$$
+\frac{1}{k!} = \frac{k + 1}{(k + 1)!}
+$$&lt;/p&gt;
+&lt;p&gt;Так что алгоритм нахождения всех обратных факториалов следующий: идем с конца, изначально устанавливаем, что обратное к $(p - 1)!$ — это $-1$, а затем пересчитываем по очереди обратное к $k!$ как обратное к $(k + 1)!$, умноженное на $k + 1$.&lt;/p&gt;
+&lt;p&gt;Теперь пусть мы посчитали все факториалы и все обратные факториалы за $O(p)$. Как найти обратные ко всем остаткам? С этим нам поможет следующая формула:&lt;/p&gt;
+&lt;p&gt;$$
+\frac{1}{k} = \frac{(k - 1)!}{k!}
+$$&lt;/p&gt;
+&lt;p&gt;А отношение двух факториалов — это произведение первого факториала на обратное ко второму.&lt;/p&gt;
+&lt;p&gt;Представим код алгоритма:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;n&#34;&gt;vector&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getAllModularInverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;vector&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inverseFactorials&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;inverseFactorials&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// -1 mod p = p - 1
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;inverseFactorials&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1LL&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inverseFactorials&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;n&#34;&gt;vector&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;inverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1LL&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inverseFactorials&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1LL&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;factorial&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Весь алгоритм — это два прохода по числам от $1$ до $p - 1$, так что работает он за $O(p)$.
+Потребление памяти тоже $O(p)$, потому что нужно хранить массивы факториалов и обратных факториалов.
+От одного из них можно избавиться, если вычислять ответ на лету (в приведенном коде мы не хранили факториалы), однако не от обоих.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Упражнение:&lt;/strong&gt;
+Придумайте модернизацию этого алгоритма, которая работает за $O(p)$, но при этом потребляет $O(\sqrt{p})$ памяти (считайте, что ответы — вектор &lt;code&gt;inverses&lt;/code&gt; — вы можете просто выводить на экран, и вам не нужно их хранить).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Заметим, что можно считать обратные факториалы, начиная не обязательно с $p - 1$. Если нам нужно найти обратные ко всем остаткам от $1$ до $n$, то можно за $O(n)$ посчитать $n! \bmod p$, найти к нему обратное за $O(\log p)$ и потом аналогично представленному выше способу насчитать все обратные факториалы от $1$ до $n$. Тогда подсчет обратных ко всем остаткам от $1$ до $n$ будет работать за $O(n + \log p)$.&lt;/p&gt;
+&lt;p&gt;Как вы можете видеть, алгоритм очень простой. Однако его редко получится где-то применить, потому что, во-первых, нахождение всех обратных по отдельности работает за $O(p \log p)$, что тяжело отсечь от $O(p)$ на неучебной задаче,
+а во-вторых, модуль чаще всего — это число порядка $10^9$, поэтому вы не имеете возможности посчитать обратные ко всем остаткам, и использование стандартного алгоритма за $O(n \log p)$ дает более эффективное решение.&lt;/p&gt;
+&lt;h2 id=&#34;алгоритм-одного-цикла&#34;&gt;Алгоритм одного цикла&lt;/h2&gt;
+&lt;p&gt;Второй алгоритм пишется всего одним циклом. Однако чтобы его вспомнить, придется написать пару формул на бумажке.&lt;/p&gt;
+&lt;p&gt;Алгоритм основывается на одном простом факте:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Теорема:&lt;/strong&gt;
+$$
+\frac{1}{k} \equiv -\left\lfloor \frac{p}{k} \right\rfloor \cdot \frac{1}{p \bmod k} \pmod p
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+Давайте представим $p$ в виде $k \cdot x + y$, где $x = \left\lfloor \frac{p}{k} \right\rfloor$ и $y = p \bmod k$.&lt;/p&gt;
+&lt;p&gt;Необходимо проверить, что&lt;/p&gt;
+&lt;p&gt;$$k \cdot \left(-\left\lfloor \frac{p}{k} \right\rfloor \cdot \frac{1}{p \bmod k} \right) \equiv 1 \pmod p$$&lt;/p&gt;
+&lt;p&gt;$$
+k \cdot (-x \cdot \frac{1}{y}) = - (k \cdot x) \cdot \frac{1}{y} = - \left((k \cdot x + y) - y\right) \cdot \frac{1}{y} = - (p - y) \cdot \frac{1}{y} \equiv y \cdot \frac{1}{y} \equiv 1 \pmod p
+$$&lt;/p&gt;
+&lt;p&gt;Что и требовалось доказать.&lt;/p&gt;
+&lt;p&gt;Таким образом, мы можем посчитать обратное к $k$, если уже посчитано обратное к $p \bmod k$. Заметим, что это число меньше, чем $k$,
+поэтому все обратные можно вычислять по порядку.&lt;/p&gt;
+&lt;p&gt;Реализация у этого алгоритма крайне проста:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;n&#34;&gt;vector&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;getAllModularInverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;vector&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;inverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;inverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1LL&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;c1&#34;&gt;// +p because this number is negative
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inverses&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Также преимуществом этого метода является то, что это просто один цикл &lt;code&gt;for&lt;/code&gt; по возрастанию, поэтому можно считать обратные не ко всем остаткам, а к первым $n$ остаткам за $O(n)$ очень легко. Однако не очень ясно, для чего это может вам понадобиться.&lt;/p&gt;
+&lt;p&gt;При тестировании на $p$ порядка $10^8$ второй алгоритм работает примерно в два раза быстрее, чем первый.&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Персистентный Convex Hull Trick</title>
+      <link>https://peltorator.ru/try_web/post/persistent_cht/</link>
+      <pubDate>Mon, 13 Sep 2021 17:52:00 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/persistent_cht/</guid>
+      
+      <description>&lt;p&gt;Во многих задачах на динамическое программирование используется &amp;ldquo;Convex Hull Trick&amp;rdquo; (CHT), то есть способ быстрого пересчета динамики как максимума или минимума линейных функций. Однако минусом этой техники является ее амортизированность: хранится стек прямых из выпуклой оболочки, и при добавлении новой прямой удаляются все бесполезные прямые с вершины стека. Одна конкретная такая операция может занимать $O(n)$ времени. В результате чего обычный convex hull trick нельзя сделать персистентным или использовать откаты. Для решения этой проблемы обычно используют &lt;a href=&#34;https://peltorator.ru/try_web/try_web/post/li-chao/&#34;&gt;дерево Ли Чао&lt;/a&gt;, которое является неамортизированной альтернативой CHT. В этой главе мы рассмотрим, как легко можно сделать персистентным сам convex hull trick.&lt;/p&gt;
+&lt;p&gt;Нам нужно научиться за неамортизированное время удалять большое количество элементов с вершины стека (в принципе, предложенный алгоритм подходит не только конкретно для CHT). При помощи бинпоиска мы могли бы найти последнюю прямую на стеке, которую нужно оставить, но не понятно, как удалить все ненужные прямые быстро. Однако мы все равно хотим сделать наш стек персистентным, поэтому не будем ничего удалять, а создадим новую ветку. То есть вместо стека у нас будет дерево, и если мы находимся в какой-то вершине, то текущий стек — это все элементы на пути до корня. Это сразу решает и проблему амортизированности, и проблему персистентности. Однако появляется новая проблема — и при поиске последней прямой, которую нужно оставить, и при поиске минимума линейных функций в точке, мы используем бинпоиск по стеку. В дереве мы этого сделать, к сожалению, не можем.&lt;/p&gt;
+&lt;p&gt;Для этого давайте в дереве хранить двоичные подъемы. Тогда вместо бинпоиска можно использовать подъем по дереву при помощи двоичных подъемов, который используется при поиске LA и LCA. Так как после каждой итерации добавляется ровно одна вершина в дерево как лист, то двоичные подъемы можно пересчитывать на лету для новой вершины. Асимптотика получившегося алгоритма — $O((n + q) \log n)$ на $n$ запросов добавления прямых и $q$ запросов получения минимума в точке. Используемая память — $O(n \log n)$. При помощи &lt;a href=&#34;https://peltorator.ru/try_web/try_web/post/linear_binups/&#34;&gt;двоичных подъемов с линейной памятью&lt;/a&gt; можно уменьшить потребляемую память до $O(n)$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Упражнение:&lt;/strong&gt; Дано подвешенное дерево. $p_v$ — предок вершины $v$ ($p_v &amp;lt; v$). В каждой его вершине $v$ находится какая-то линейная функция $v \cdot x + b_v$ и число $a_v$. Для каждой вершины дерева необходимо найти минимум по линейным функциям на пути до корня в точке $a_v$.&lt;/p&gt;
+&lt;p&gt;В случае, если в задаче необходим динамический CHT, то есть прямые не упорядочены монотонно по углу наклона, задача становится немного сложнее. Обычно в таком случае прямые хранятся в &lt;code&gt;std::set&lt;/code&gt;, и при добавлении по обе стороны от добавляемой прямой удаляются ненужные. Чтобы сделать эту структуру неамортизированной, будем хранить вместо &lt;code&gt;std::set&lt;/code&gt; декартово дерево. Тогда спуском по дереву можно найти левую и правую границы отрезка прямых, которые нужно удалить, после чего можно вставить новую прямую. Спуск по дереву в данном случае является заменой стандартному бинпоиску. Чтобы сделать эту структуру персистентной, необходимо использовать персистентное декартово дерево.&lt;/p&gt;
+&lt;p&gt;В отличие от простого алгоритма для обычного CHT, алгоритм для динамического CHT сложен в реализации, поэтому рекомендуется вместо него использовать все-таки дерево Ли Чао.&lt;/p&gt;
+&lt;h2 id=&#34;задачи-для-практики&#34;&gt;Задачи для практики&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://ceoi.inf.elte.hu/probarch/09/harbingers.pdf&#34;&gt;http://ceoi.inf.elte.hu/probarch/09/harbingers.pdf&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Двоичные подъемы с линейной памятью</title>
+      <link>https://peltorator.ru/try_web/post/linear_binups/</link>
+      <pubDate>Mon, 13 Sep 2021 17:35:30 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/linear_binups/</guid>
+      
+      <description>&lt;p&gt;Часто в задачах на деревья используются &lt;a href=&#34;https://e-maxx.ru/algo/lca_simpler&#34;&gt;двоичные подъемы&lt;/a&gt;. Они помогают искать LCA (наименьшего общего предка), какую-то функцию на пути и так далее. Однако они занимают $O(n \log n)$ памяти. В этой главе мы рассмотрим альтернативную структуру со схожей функциональностью, занимающую линейную память.&lt;/p&gt;
+&lt;h2 id=&#34;идея&#34;&gt;Идея&lt;/h2&gt;
+&lt;p&gt;В двоичных подъемах мы для каждой вершины храним предков на $1$, $2$, $4$, $\ldots$, $2^k$ вверх. Чтобы сделать структуру линейной, мы будем хранить только двух предков: непосредственного отца &lt;code&gt;parent&lt;/code&gt;) и еще какого-то одного предка (&lt;code&gt;jump&lt;/code&gt;). И тогда если мы для каждой вершины еще сохраним ее глубину (&lt;code&gt;depth&lt;/code&gt;), то мы сможем легко отвечать на запросы. К примеру, если нам надо найти предка текущей вершины на какой-то глубине, то каждый раз, когда мы стоим в вершине, мы будем сначала смотреть на более длинный прыжок, если он не выше нужной нам вершины, будем совершать этот прыжок, а если же он все таки выше, то просто переходить в отца. Таким способом мы гарантировано придем в нужную вершину, осталось только построить такие прыжки, чтобы этот путь занимал всегда логарифмическое количество шагов.&lt;/p&gt;
+&lt;p&gt;При этом структура будет динамическая, так же как и обычные двоичные подъемы. То есть мы можем добавлять вершины в дерево по очереди, и старые прыжки не будут пересчитываться.&lt;/p&gt;
+&lt;p&gt;Остается лишь придумать, как построить прыжки. Давайте сделаем это следующим образом: если прыжок из нашего отца (&lt;code&gt;par&lt;/code&gt;) имеет такую же длину, как и прыжок из прыжка нашего отца (&lt;code&gt;jump[par]&lt;/code&gt;), то мы проведем ребро в прыжок прыжка нашего отца (&lt;code&gt;jump[jump[par]]&lt;/code&gt;), а иначе проведем ребро просто в нашего отца. Если вы запутались, то рекомендую осознать код:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;addLeaf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;parent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;depth&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;depth&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;depth&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;depth&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;jump&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;depth&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;jump&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;depth&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;jump&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;jump&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]]])&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;jump&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;jump&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;jump&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]];&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;jump&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;par&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;доказательство&#34;&gt;Доказательство&lt;/h2&gt;
+&lt;p&gt;Почему же с такими прыжками нам придется совершить лишь логарифмическое количество переходов? Для понимания полезно нарисовать картинку. Заметим, что на длину прыжка из вершины $v$ (а также длины прыжков из всех ее предков) влияет только ее глубина, но не структура дерева. Поэтому можно рассмотреть лишь ситуацию, в которой наше дерево является бамбуком. Давайте заметим, что длина любого прыжка равна степени двойки (если считать длину не по количеству ребер, а по количеству вершин). Действительно, для прыжка в отца длина равна $2$, а любой новый прыжок — это либо прыжок в отца, либо комбинация двух одинаковых прыжков. Тогда если те прыжки имели длину, равную степени двойки, то и комбинация тоже.&lt;/p&gt;
+&lt;p&gt;Однако в отличие от обычных двоичных подъемов, в которых мы постепенно уменьшали длину прыжка, здесь все немного сложнее. Сначала длина прыжка постепенно увеличивается, а потом постепенно уменьшается. Это чем-то похоже на путешествие между городами. Сначала мы едем по маленьким улочкам, постепенно выезжая на более широкие проспекты, в конце концов выезжаем на шоссе, а в конце пути происходит симметричная ситуация: мы съезжаем с магистралей на проспекты, а с проспектов на узкие улочки.&lt;/p&gt;
+&lt;p&gt;Давайте разделим наш путь на две части: сначала длины прыжков постепенно возрастают, и мы всегда используем прыжок, потом в какой-то момент прыжок ведет в слишком высокую вершину, поэтому нам приходится использовать переход в отца, после чего мы будем иногда использовать переходы в отцов, а иногда прыжки, но длины прыжков будут не возрастать.&lt;/p&gt;
+&lt;p&gt;Докажем несколько утверждений.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Теорема:&lt;/strong&gt; Прыжки не пересекаются (но один может лежать строго внутри другого).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Докажем это утверждение по индукции. Пусть это утверждение верно для всех предков текущей вершины, докажем для прыжка из текущей вершины.
+Если прыжок ведет в отца, то такой прыжок, очевидно, не может ни с кем пересекаться. Если же прыжок ведет не в отца, то он является комбинацией двух прыжков. Если какой-то прыжок пересекается с новым прыжком, то он пересекается и с одним из двух меньших прыжков. Но для них мы уже доказали по предположению индукции, что они попарно не пересекаются.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Теорема:&lt;/strong&gt; Не может быть больше двух одинаковых прыжков подряд, то есть не может быть так, что длины прыжков из &lt;code&gt;v&lt;/code&gt;, &lt;code&gt;jump[v]&lt;/code&gt; и &lt;code&gt;jump[jump[v]]&lt;/code&gt; совпадают.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+Действительно, если бы они все совпадали, то прыжок из сына &lt;code&gt;jump[v]&lt;/code&gt; вел бы в &lt;code&gt;jump[jump[v]]&lt;/code&gt;, потому что прыжки его предков равны по длине. А тогда этот прыжок бы пересекался с прыжком из $v$, что невозможно по предыдущей теореме.&lt;/p&gt;
+&lt;p&gt;Крайним случаем будет ситуация, когда длины всех трех прыжков равны единице, однако в этой ситуации из &lt;code&gt;v&lt;/code&gt; прыжок должен вести в &lt;code&gt;jump[jump[v]]&lt;/code&gt;, а не в &lt;code&gt;jump[v]&lt;/code&gt;, что противоречит условию.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Теорема:&lt;/strong&gt; Длина прыжка из &lt;code&gt;v&lt;/code&gt; не больше длины прыжка из &lt;code&gt;jump[v]&lt;/code&gt; в том случае, если &lt;code&gt;jump[v]&lt;/code&gt; — это не корень. То есть если мы переходим по прыжкам, то их длины не убывают.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+Действительно, если наш прыжок ведет в корень, то оттуда уже некуда прыгать. А иначе прыжок будет иметь не меньшую длину.&lt;/p&gt;
+&lt;p&gt;Докажем это утверждение по индукции. Пусть это утверждение верно для всех предков текущей вершины, докажем для прыжка из текущей вершины.
+Если этот прыжок ведет в отца, то это самый маленький возможный прыжок, и следующий точно не меньше.
+Если же прыжок ведет не в отца, то он был получен из двух меньших прыжков длины в два раза меньше, Тогда так как для всех предков утверждение уже верно, то прыжок из нашего прыжка точно не может быть короче нашего прыжка более, чем в два раза. Однако если он короче ровно в два раза, то мы получаем три последовательных прыжка одинаковой длины, чего не бывает по предыдущей теореме. Поэтому прыжок из нашего прыжка имеет длину не меньше, чем текущий прыжок.&lt;/p&gt;
+&lt;p&gt;Из этих утверждений легко понять, что первая фаза путешествия, в которой мы всегда переходим по прыжкам, работает за логарифмическое время. Действительно, длина прыжка не убывает, но при этом она не может оставаться фиксированной более, чем два раза, поэтому через $2 \log n$ итераций длина прыжка станет не меньше $n$, и в этот момент прыжок уже точно будет выше, чем необходимая нам вершина.&lt;/p&gt;
+&lt;p&gt;На второй же фазе путешествия мы пытаемся получить точную вершину, в которую нам нужно прийти. нам не подходит прыжок длины $2^k$, то есть наша вершина находится между текущей вершиной и прыжком из нее. Тогда мы переходим в нашего отца, в результате чего отрезок, на котором мы ищем, поделился на два. И если нужная вершина находится в верхней половине, то мы сделаем прыжок из нашего отца, а если в нижней, то не сделаем. В любом случае, через каждые два шага длина прыжка из текущей вершины будет уменьшаться в два раза, и таким бинпоиском мы постепенно придем в нужную вершину.&lt;/p&gt;
+&lt;h2 id=&#34;поиск-предка-на-глубине-h&#34;&gt;Поиск предка на глубине $h$&lt;/h2&gt;
+&lt;p&gt;Доказательство не совсем очевидно, однако его не нужно помнить, чтобы применять эту структуру данных. Давайте рассмотрим пример ее работы для задачи LA (level ancestor), то есть поиска предка текущей вершины на глубине $h$. Для этого мы постепенно идем наверх, пытаясь пойти в прыжок текущей вершины, если его глубина не меньше $h$, а в противном случае идем в отца.&lt;/p&gt;
+&lt;p&gt;С реализацией можно ознакомиться по &lt;a href=&#34;https://pastebin.com/tyrL8gMQ&#34;&gt;ссылке&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Асимптотика ответа на $q$ запросов на дереве из $n$ вершин будет $O(n + q \log n)$.&lt;/p&gt;
+&lt;h2 id=&#34;поиск-наименьшего-общего-предка&#34;&gt;Поиск наименьшего общего предка&lt;/h2&gt;
+&lt;p&gt;Теперь рассмотрим другую задачу, для решения которой обычно используют бинарные подъемы: LCA (least common ancestor или наименьший общий предок). Воспользуемся следующей идеей: сначала из более глубокой вершины перейдем на глубину менее глубокой при помощи LA, а затем будем параллельно подниматься наверх из двух вершин. Обратите внимание на то, что если две вершины находятся на одной и той же глубине, то длины их прыжков совпадают, поэтому мы можем переходить по прыжку в том случае, если концы этих прыжков не равны, а в противном случае переходить в отца.&lt;/p&gt;
+&lt;p&gt;С реализацией можно ознакомиться по &lt;a href=&#34;https://pastebin.com/shHVMMBQ&#34;&gt;ссылке&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Асимптотика ответа на $q$ запросов на дереве из $n$ вершин будет $O(n + q \log n)$.&lt;/p&gt;
+&lt;p&gt;Также аналогично двоичным подъемам можно хранить значение какой-то функции на прыжке и при помощи этого искать значение функции на пути в дереве.&lt;/p&gt;
+&lt;h2 id=&#34;задачи-для-практики&#34;&gt;Задачи для практики&lt;/h2&gt;
+&lt;p&gt;Для практики подойдут любые задачи на двоичные подъемы и LCA.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.hackerrank.com/challenges/kth-ancestor/problem&#34;&gt;Задача&lt;/a&gt; на поиск $k$-го предка в дереве.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.spoj.com/problems/LCA/&#34;&gt;Задача&lt;/a&gt; на поиск наименьшего общего предка.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;https://codeforces.com/contest/609/problem/E&#34;&gt;Задача&lt;/a&gt;, в которой нужно еще некоторые знания о минимальных остовных деревьях.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+      
+    </item>
+    
     <item>
       <title>RMQ offline: вариация алгоритма Тарьяна</title>
       <link>https://peltorator.ru/try_web/post/rmq_offline_tarjan_variation/</link>

@@ -1,6 +1,14 @@
+%s/\\chapter{\(.*\)}\(.*\) \\label{\(.*\)}/\\chapter{\1}/g
+%s/\\chapter{\(.*\)}/---\rtitle: "\1"\rdate: IAMASTRINGOFDATETIMETOBEREPLACED\rdraft: false\r---/g
+%s/IAMASTRINGOFDATETIMETOBEREPLACED/\=strftime("%Y-%m-%dT%H:%M:%S+03:00")/g
 %s/\\O/O/g
 %s/\~---/ —/g
-%s/\\end\(.*\)//g
+%s/\\begin{tikzpicture}/<script type="text\/tikz">\r\\begin{tikzpicture}/g
+%s/\\end{tikzpicture}/\\endd{tikzpicture}/g
+%s/\\end{scriptsize}/\\endd{scriptsize}/g
+%s/\\end{\(.*\)}//g
+%s/\\endd{tikzpicture}/\\end{tikzpicture}\r<\/script>/g
+%s/\\endd{scriptsize}/\\end{scriptsize}/g
 %s/\\section{\(.*\)}\(.*\)\index{\(.*\)}/\#\# \1/g
 %s/\\section{\(.*\)}/\#\# \1/g
 %s/\\href{\(.*\)}{\(.*\)}/[\2](\1)/g
@@ -9,3 +17,12 @@
 %s/\\verb+\(.*\)+/`\1`/g
 %s/\\begin{theorem}/**Теорема:**/g
 %s/\\begin{observation}/**Замечание:**/g
+%s/\\begin{problem}/**Задача:**/g
+%s/\\begin{example}/**Пример:**/g
+%s/\\begin{exercise}/**Упражнение:**/g
+%s/\\begin{lemma}/**Лемма:**/g
+%s/\\begin{proof}/**Доказательство:**/g
+%s/\\begin{itemize}//g
+%s/\\begin{code}/```cpp/g
+%s/,>=triangle 45//g
+%s/б\\'{о}льшие/бóльшие/g

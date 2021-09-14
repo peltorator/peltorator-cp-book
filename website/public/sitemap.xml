@@ -3,10 +3,52 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://peltorator.ru/try_web/</loc>
-    <lastmod>2021-09-12T13:20:05+03:00</lastmod>
+    <lastmod>2021-09-14T13:38:44+03:00</lastmod>
   </url><url>
     <loc>https://peltorator.ru/try_web/post/</loc>
-    <lastmod>2021-09-12T13:20:05+03:00</lastmod>
+    <lastmod>2021-09-14T13:38:44+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/stress/</loc>
+    <lastmod>2021-09-14T13:38:44+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/random/</loc>
+    <lastmod>2021-09-14T13:26:39+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/halfplanes_intersection_point_inside/</loc>
+    <lastmod>2021-09-14T13:12:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/min_circle/</loc>
+    <lastmod>2021-09-14T13:10:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/halfplanes_intersection_linear/</loc>
+    <lastmod>2021-09-14T13:04:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/closest_points_linear/</loc>
+    <lastmod>2021-09-14T12:41:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/discrete_log/</loc>
+    <lastmod>2021-09-14T12:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/square_root_mod/</loc>
+    <lastmod>2021-09-14T12:32:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/powerful_number_sieve/</loc>
+    <lastmod>2021-09-14T12:04:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/mod_factorial_fast/</loc>
+    <lastmod>2021-09-13T18:32:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/mod_factorial/</loc>
+    <lastmod>2021-09-13T18:25:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/all_mod_inv/</loc>
+    <lastmod>2021-09-13T18:10:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/persistent_cht/</loc>
+    <lastmod>2021-09-13T17:52:00+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/linear_binups/</loc>
+    <lastmod>2021-09-13T17:35:30+03:00</lastmod>
   </url><url>
     <loc>https://peltorator.ru/try_web/post/rmq_offline_tarjan_variation/</loc>
     <lastmod>2021-09-12T13:20:05+03:00</lastmod>
