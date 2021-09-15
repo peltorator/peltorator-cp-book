@@ -135,16 +135,14 @@ $$</p>
 <p>$$
 =  N^c \int\limits_{1}^{\sqrt{N}} a^{-2c} \cdot (3c - 1) \cdot (1 - const_1) \ \mathrm{d}a \le
 $$</p>
-<p><img src="/try_web/images/powerful_number_sieve_cases.png" alt="обращения Мёбиуса"></p>
 <p>$$
 \le (3c - 1)N^c\int\limits_{1}^{\sqrt{N}} a^{-2c} \  \mathrm{d}a\leq
 \begin{cases}
-(1 - 2c)(3c - 1)N^c\cdot N^{1/2 - c} = O(\sqrt{N}), &amp; c &lt; \frac{1}{2}, \<br>
-(3c - 1)N^c\ln\sqrt{N} = O(\sqrt{N}\log{n}), &amp; c = \frac{1}{2}, \<br>
+(1 - 2c)(3c - 1)N^c\cdot N^{1/2 - c} = O(\sqrt{N}), &amp; c &lt; \frac{1}{2}, \\<br>
+(3c - 1)N^c\ln\sqrt{N} = O(\sqrt{N}\log{n}), &amp; c = \frac{1}{2}, \\<br>
 (3c - 1)(2c - 1)N^c = O(T_{s_g}(N)), &amp; c &gt; \frac{1}{2}.
 \end{cases}
 $$</p>
-<p><span style="color:red">TODO: Почему-то <em>cases</em> окружение из LaTeX не отображается в Markdown</span></p>
 <p>Где $const_1$ — какое-то положительное число.</p>
 <p>Очевидно, если $c \le 1/3$, то время работы и подавно составляет $O(\sqrt{N})$.</p>
 <p><strong>Пример:</strong>

@@ -3,10 +3,34 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://peltorator.ru/try_web/</loc>
-    <lastmod>2021-09-14T13:38:44+03:00</lastmod>
+    <lastmod>2021-09-15T17:59:03+03:00</lastmod>
   </url><url>
     <loc>https://peltorator.ru/try_web/post/</loc>
-    <lastmod>2021-09-14T13:38:44+03:00</lastmod>
+    <lastmod>2021-09-15T17:59:03+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/hadamard/</loc>
+    <lastmod>2021-09-15T17:59:03+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/li-chao/</loc>
+    <lastmod>2021-09-15T17:39:24+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/farach_colton_bender/</loc>
+    <lastmod>2021-09-15T17:32:38+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/segment_tree_beats/</loc>
+    <lastmod>2021-09-15T16:03:38+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/down_segment_tree/</loc>
+    <lastmod>2021-09-15T15:53:15+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/sparse_table/</loc>
+    <lastmod>2021-09-15T11:33:48+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/prefix_sums/</loc>
+    <lastmod>2021-09-15T10:24:12+03:00</lastmod>
+  </url><url>
+    <loc>https://peltorator.ru/try_web/post/fast_io/</loc>
+    <lastmod>2021-09-15T10:16:31+03:00</lastmod>
   </url><url>
     <loc>https://peltorator.ru/try_web/post/stress/</loc>
     <lastmod>2021-09-14T13:38:44+03:00</lastmod>
@@ -50,7 +74,7 @@
     <loc>https://peltorator.ru/try_web/post/linear_binups/</loc>
     <lastmod>2021-09-13T17:35:30+03:00</lastmod>
   </url><url>
-    <loc>https://peltorator.ru/try_web/post/rmq_offline_tarjan_variation/</loc>
+    <loc>https://peltorator.ru/try_web/post/rmq_offline/</loc>
     <lastmod>2021-09-12T13:20:05+03:00</lastmod>
   </url><url>
     <loc>https://peltorator.ru/try_web/categories/</loc>

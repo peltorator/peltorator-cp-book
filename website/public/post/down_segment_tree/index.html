@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+<meta name="author" content="peltorator">
+
+
+
+<meta name="description" content="Дерево отрезков — крайне функциональная структура данных, с помощью которой можно решить огромное количество задач. Однако оно достаточно медленное: производятся рекурсивные вызовы и тому подобное. Иногда это приводит к тому, что решение может не проходить по времени. Кроме того, стандартное дерево отрезков — это не самый очевидный для написания алгоритм.
+Чтобы решить эти проблемы часто прибегают к использованию дерева Фенвика. Оно очень простое в реализации, очень быстро работает, а также его легко обобщать для бóльших размерностей.">
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+
+<meta name="keywords" content=" hugo  latex  theme ">
+
+
+
+
+<script>
+  
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    }
+  };
+</script>
+
+<script async defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+
+
+<script src="https://tikzjax.com/v1/tikzjax.js"></script>
+<script src="https://tikzwolke.com/v1/tikzwolke.js"></script>
+
+
+<link rel="canonical" href="https://peltorator.ru/try_web/post/down_segment_tree/">
+
+
+
+
+<title>Дерево отрезков снизу - peltorator</title>
+
+
+
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/try_web/css/common.css'>
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/try_web/css/content.css'>
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/try_web/css/highlight.css'>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Дерево отрезков снизу" />
+<meta name="twitter:description" content="Дерево отрезков — крайне функциональная структура данных, с помощью которой можно решить огромное количество задач. Однако оно достаточно медленное: производятся рекурсивные вызовы и тому подобное. Иногда это приводит к тому, что решение может не проходить по времени. Кроме того, стандартное дерево отрезков — это не самый очевидный для написания алгоритм.
+Чтобы решить эти проблемы часто прибегают к использованию дерева Фенвика. Оно очень простое в реализации, очень быстро работает, а также его легко обобщать для бóльших размерностей." />
+
+
+  <link rel="stylesheet" href='https://peltorator.ru/try_web/css/single.css'>
+</head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1>
+    <a href="https://peltorator.ru/try_web/">peltorator</a>
+  </h1>
+
+  <nav>
+    
+  </nav>
+</header>
+
+    <main id="main" class="post">
+      
+      
+      
+      <h1>Дерево отрезков снизу</h1>
+      
+      <div class="content">
+        
+        <p>Дерево отрезков — крайне функциональная структура данных, с помощью которой можно решить огромное количество задач. Однако оно достаточно медленное: производятся рекурсивные вызовы и тому подобное. Иногда это приводит к тому, что решение может не проходить по времени. Кроме того, стандартное дерево отрезков — это не самый очевидный для написания алгоритм.</p>
+<p>Чтобы решить эти проблемы часто прибегают к использованию дерева Фенвика. Оно очень простое в реализации, очень быстро работает, а также его легко обобщать для бóльших размерностей. Однако оно ограничено тем, что в своей базовой вариации оно подходит только для обратимых операций, потому что считает функцию на отрезке через два префикса. То есть, к примеру, минимум на отрезке стандартным деревом Фенвика посчитать не получится. Кроме того, стандартное дерево Фенвика поддерживает изменение только в точке, но не на отрезке. В таких ситуациях вам может захотеться прибегнуть к использованию дерева отрезков снизу. Это нерекурсивная структура данных, которая одновременно работает так же быстро, как и дерево Фенвика, и при этом так же (или почти) функциональна как обычное дерево отрезков.</p>
+<h2 id="изменение-в-точке-сумма-на-отрезке">Изменение в точке, сумма на отрезке</h2>
+<p>Идея скрывается в названии. Если в обычном дереве отрезков мы начинаем с корня и идем вниз, разбивая отрезок запроса на логарифм подотрезков, то в дереве отрезков снизу мы начинаем с листьев и поднимаемся вверх.</p>
+<p>Для начала давайте дополним длину массива до ближайшей степени двойки, чтобы он полностью лежал на одном уровне дерева. От этого асимптотика никак не поменяется.</p>
+<p>Давайте сначала рассмотрим базовую задачу. Есть запросы двух видов: изменить значение в точке и найти сумму на отрезке.</p>
+<p>Изменение в точке реализуется очень просто. Мы изменяем значение в листе, соответствующем этой точке, а затем постепенно идем до корня, обновляя значения в вершинах на пути через значения в детях.</p>
+<p>Поиск суммы на отрезке тоже весьма прост. Вместо того, чтобы суммировать отрезок из $k$ значений на текущем уровне, мы можем перейти на предыдущий уровень, и там просуммировать лишь $\frac{k}{2}$ значений, ведь элементы более высокого уровня отвечают за сумму двух соседних элементов текущего уровня. Однако если левая граница отрезка является правым сыном, либо правая граница является левым сыном, то мы не можем перейти для них на предыдущий уровень, и их значения надо прибавить на текущем этапе. Так мы будем постепенно подниматься по дереву, делая на каждом уровне константное количество операций.</p>
+<p>Асимптотика изменения равна $O(\log n)$, потому что состоит просто из прохода от листа к корню, а асимптотика нахождения суммы на полуинтервале $[l, r)$ равна $O(\log (r - l))$, что в общем случае, конечно, равно $O(\log n)$.</p>
+<p>Построение дерева выглядит совсем просто. Мы записываем элементы изначального массива в листья подряд, а затем проходим по внутренним вершинам по убыванию, пересчитывая значение текущей вершины через детей.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">const</span> <span class="kt">int</span> <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">);</span> <span class="c1">// N = 2^k, N &gt;= n
+</span><span class="c1"></span><span class="kt">long</span> <span class="kt">long</span> <span class="n">tree</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">];</span>
+
+<span class="kt">void</span> <span class="nf">build</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">N</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tree</span><span class="p">[(</span><span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">updatePoint</span><span class="p">(</span><span class="kt">int</span> <span class="n">pos</span><span class="p">,</span> <span class="kt">int</span> <span class="n">newVal</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pos</span> <span class="o">+=</span> <span class="n">N</span><span class="p">;</span>
+    <span class="n">tree</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">newVal</span><span class="p">;</span>
+    <span class="n">pos</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">pos</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tree</span><span class="p">[(</span><span class="n">pos</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="n">pos</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">long</span> <span class="kt">long</span> <span class="nf">findSum</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// [l, r)
+</span><span class="c1"></span>    <span class="n">l</span> <span class="o">+=</span> <span class="n">N</span><span class="p">;</span>
+    <span class="n">r</span> <span class="o">+=</span> <span class="n">N</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">ans</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="n">l</span><span class="o">++</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="o">--</span><span class="n">r</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="n">l</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">r</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>Мы заменили все операции на битовые для ускорения. Отец вершины <code>v</code> — это <code>v &gt;&gt; 1</code>, а сыновья — <code>v &lt;&lt; 1</code> и <code>(v &lt;&lt; 1) | 1</code>. Вершина является правым сыном, если ее номер нечетный, а левым, если четный (обратите внимание, что и для левой, и для правой границы условия в <code>findSum</code> одинаковые, потому что правая граница берется не включительно).</p>
+<p>Однако самое удивительное — это то, что на самом деле везде в этом коде вместо <code>N</code> можно написать <code>n</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">const</span> <span class="kt">int</span> <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">);</span> <span class="c1">// N &gt;= n
+</span><span class="c1"></span><span class="kt">long</span> <span class="kt">long</span> <span class="n">tree</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">];</span>
+<span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">build</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tree</span><span class="p">[(</span><span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">updatePoint</span><span class="p">(</span><span class="kt">int</span> <span class="n">pos</span><span class="p">,</span> <span class="kt">int</span> <span class="n">newVal</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pos</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">tree</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">newVal</span><span class="p">;</span>
+    <span class="n">pos</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">pos</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tree</span><span class="p">[(</span><span class="n">pos</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="n">pos</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">long</span> <span class="kt">long</span> <span class="nf">findSum</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// [l, r)
+</span><span class="c1"></span>    <span class="n">l</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">r</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">ans</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="n">l</span><span class="o">++</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="o">--</span><span class="n">r</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="n">l</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">r</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p><strong>Замечание:</strong>
+Если вам нужно работать с некоммутативной операцией, то нужно комбинировать ответ правильно. Нужно отдельно хранить левый префикс ответа и правый суффикс, а в конце их объединять.</p>
+<p>Таким образом, наша структура будет занимать ровно $2n$ памяти в отличие от обычного дерева отрезков, которому в зависимости от реализации бывает нужно от $4n$ до $8n$ памяти.</p>
+<p>Конечно, для операции суммы можно использовать и дерево Фенвика, но так как у нас есть вся мощь дерева отрезков, мы можем считать практически любую другую функцию на отрезке. К примеру, минимум, с которым стандартное дерево Фенвика не справится.</p>
+<h2 id="изменение-на-отрезке-значение-в-точке">Изменение на отрезке, значение в точке</h2>
+<p>Как обычно, структуру, которая умеет изменять в точке и находить значение функции на отрезке, можно переделать в структуру, которая умеет изменять целый отрезок и находить значение в точке. Для этого нам надо просто поменять местами функцию изменения с функцией нахождения значения. Функция изменения теперь разобьет отрезок запроса на логарифм вершин дерева отрезков, в каждой из которых оно оставит изменение, которое нужно сделать со всем поддеревом. Функция нахождения значения в точке в свою очередь пройдется по пути до корня и посчитает ответ.</p>
+<p><strong>Замечание:</strong>
+Обратите внимание, что в этом случае нам необходимо, чтобы операции изменения на отрезке были коммутативны, то есть порядок их применения был неважен. К примеру, для операции прибавления на отрезке это верно, а для операции присвоения на отрезке это неверно. Дело в том, что мы оставляем изменения в вершинах дерева, а когда пытаемся найти значение, идем по порядку по вершинам, но изменения в них могут быть перемешаны во времени. Конкретно для присвоения на отрезке можно кроме самого присвоения хранить еще и момент времени, когда оно было сделано, а потом выбрать максимум таких моментов, однако в общем случае, возможно, что все операции придется применить в правильном порядке, и тогда нам придется их отсортировать, поэтому запрос нахождения значения в точке будет работать за $O(\log n \cdot \log \log n)$. Для некоммутативных операций нам подойдет дерево отрезков с ленивыми обновлениями, которое мы обсудим позже.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">const</span> <span class="kt">int</span> <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">);</span> <span class="c1">// N &gt;= n
+</span><span class="c1"></span><span class="kt">long</span> <span class="kt">long</span> <span class="n">tree</span><span class="p">[</span><span class="n">N</span><span class="p">];</span>
+<span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">build</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// nothing to add on a segment
+</span><span class="c1"></span>    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">long</span> <span class="kt">long</span> <span class="nf">findValue</span><span class="p">(</span><span class="kt">int</span> <span class="n">pos</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pos</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">ans</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="n">pos</span><span class="p">];</span>
+        <span class="n">pos</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">segmentUpdate</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span><span class="p">,</span> <span class="kt">int</span> <span class="n">addVal</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// [l, r)
+</span><span class="c1"></span>    <span class="n">l</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">r</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">tree</span><span class="p">[</span><span class="n">l</span><span class="o">++</span><span class="p">]</span> <span class="o">+=</span> <span class="n">addVal</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">tree</span><span class="p">[</span><span class="o">--</span><span class="n">r</span><span class="p">]</span> <span class="o">+=</span> <span class="n">addVal</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">l</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">r</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>Обратите внимание, что в 11 строке мы не пересчитываем значение в вершине через детей, потому что теперь мы в вершине храним не сумму на отрезке, а значение, которое нужно прибавить ко всем числам на отрезке.</p>
+<h2 id="двумерные-запросы">Двумерные запросы</h2>
+<p>Когда дерево отрезков двумерное, оно становится совсем медленным, и нам нужно делать сложную схему из рекурсивного запуска запроса к одномерному дереву отрезков из двумерного. В случае нерекурсивной реализации дерева отрезков снизу все практически так же просто, как с деревом Фенвика. Необходимо лишь написать два вложенных цикла вместо одного:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">long</span> <span class="kt">long</span> <span class="nf">findSum</span><span class="p">(</span><span class="kt">int</span> <span class="n">lx</span><span class="p">,</span> <span class="kt">int</span> <span class="n">rx</span><span class="p">,</span> <span class="kt">int</span> <span class="n">ly</span><span class="p">,</span> <span class="kt">int</span> <span class="n">ry</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// [lx, rx) * [ly, ry)
+</span><span class="c1"></span>    <span class="n">lx</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">rx</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">ans</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">lx</span> <span class="o">&lt;</span> <span class="n">rx</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">curly</span> <span class="o">=</span> <span class="n">ly</span> <span class="o">+</span> <span class="n">m</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">curry</span> <span class="o">=</span> <span class="n">ry</span> <span class="o">+</span> <span class="n">m</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">curly</span> <span class="o">&lt;</span> <span class="n">curry</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">curly</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">lx</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="n">lx</span><span class="p">][</span><span class="n">curly</span><span class="p">];</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">rx</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="n">rx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">curly</span><span class="p">];</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">curry</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">lx</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="n">lx</span><span class="p">][</span><span class="n">curry</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">rx</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="n">rx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">curry</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="n">curly</span> <span class="o">=</span> <span class="p">(</span><span class="n">curly</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="n">curry</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">lx</span> <span class="o">=</span> <span class="p">(</span><span class="n">lx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">rx</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>Нужно сдвинуть границу в том случае, если она нечетна и по $x$ координате, и по $y$.</p>
+<p>С полной реализацией можно ознакомиться по <a href="https://pastebin.com/yBiQB5yu">ссылке</a>.</p>
+<h2 id="ленивые-обновления">Ленивые обновления</h2>
+<p>Чаще всего так получается, что обычно хватает обновления в точке. Либо же если все таки нужно обновление на отрезке, то ограничения не такие жестокие, и можно использовать обычное дерево отрезков. Однако давайте все таки поймем, как с помощью дерева отрезков снизу можно поддерживать изменения на отрезке и запрос поиска на отрезке. В этом нам помогут (как и в обычном дереве отрезков) ленивые обновления.</p>
+<p>Мы будем поддерживать все то же самое, что и в обычном дереве отрезков, но нужно просто перевести это на язык дерева отрезков снизу.</p>
+<p>Когда мы делаем запрос поиска на отрезке, нам нужно протолкнуть отложенные изменения из всех предков вершин, которые мы посетим. Все эти вершины — это просто предки листьев, соответствующих концам отрезка запроса. Однако проталкивать изменения надо сверху вниз, чтобы они комбинировались друг с другом. Как же это сделать в дереве отрезков снизу? Мы знаем, что предок вершины $v$ — это $\left\lfloor \frac{v}{2} \right\rfloor$, тогда $k$-й предок — это $\left\lfloor \frac{v}{2^k} \right\rfloor$. Поэтому мы можем просто перебрать степень двойки по убыванию и проталкивать изменения сверху вниз.</p>
+<p>Запрос изменения на отрезке будет выглядеть так же, как запрос поиска суммы на отрезке, только в конце после того как мы изменили какие-то значения, нужно пересчитать значения предков измененных вершин. Но это как и в прошлом случае просто предки листьев, отвечающих за концы отрезка. Однако в этот раз перебирать их надо уже как обычно — снизу вверх.</p>
+<p>Также стоит обратить внимание на то, что для вершин с номерами $[n, 2n)$ не нужно хранить ленивые обновления, потому что они являются листьями, поэтому в случае жестких ограничений по памяти можно достичь использования $3n$ ячеек.</p>
+<p>Рассмотрим код на примере задачи прибавления на отрезке и поиска максимума на отрезке:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">const</span> <span class="kt">int</span> <span class="n">H</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span> <span class="c1">// 2^H &gt;= 2n
+</span><span class="c1"></span><span class="k">const</span> <span class="kt">int</span> <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">H</span><span class="p">);</span> <span class="c1">// N &gt;= n
+</span><span class="c1"></span><span class="k">const</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">INF</span> <span class="o">=</span> <span class="mf">1e18</span><span class="p">;</span>
+<span class="kt">long</span> <span class="kt">long</span> <span class="n">tree</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">];</span>
+<span class="kt">long</span> <span class="kt">long</span> <span class="n">push</span><span class="p">[</span><span class="n">N</span><span class="p">];</span>
+<span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">build</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">arr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">arr</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tree</span><span class="p">[(</span><span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="n">push</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">apply</span><span class="p">(</span><span class="kt">int</span> <span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">tree</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">+=</span> <span class="n">val</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">push</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">+=</span> <span class="n">val</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">updateAncestors</span><span class="p">(</span><span class="kt">int</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">v</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">v</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">v</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tree</span><span class="p">[(</span><span class="n">v</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="n">v</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">doPush</span><span class="p">(</span><span class="kt">int</span> <span class="n">leaf</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">H</span><span class="p">;</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">curV</span> <span class="o">=</span> <span class="p">(</span><span class="n">leaf</span> <span class="o">&gt;&gt;</span> <span class="n">k</span><span class="p">);</span>
+        <span class="n">apply</span><span class="p">(</span><span class="n">curV</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="n">push</span><span class="p">[</span><span class="n">curV</span><span class="p">]);</span>
+        <span class="n">apply</span><span class="p">((</span><span class="n">curV</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">,</span> <span class="n">push</span><span class="p">[</span><span class="n">curV</span><span class="p">]);</span>
+        <span class="n">push</span><span class="p">[</span><span class="n">curV</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">updateSegment</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// [l, r) += val
+</span><span class="c1"></span>    <span class="n">l</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">r</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">ql</span> <span class="o">=</span> <span class="n">l</span><span class="p">,</span> <span class="n">qr</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+    <span class="n">doPush</span><span class="p">(</span><span class="n">ql</span><span class="p">);</span>
+    <span class="n">doPush</span><span class="p">(</span><span class="n">qr</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">apply</span><span class="p">(</span><span class="n">l</span><span class="o">++</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">apply</span><span class="p">(</span><span class="n">r</span><span class="o">--</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">l</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">r</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">updateAncestors</span><span class="p">(</span><span class="n">ql</span><span class="p">);</span>
+    <span class="n">updateAncestors</span><span class="p">(</span><span class="n">qr</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">long</span> <span class="kt">long</span> <span class="nf">findMax</span><span class="p">(</span><span class="kt">int</span> <span class="n">l</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// [l, r)
+</span><span class="c1"></span>    <span class="n">l</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">r</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">doPush</span><span class="p">(</span><span class="n">l</span><span class="p">);</span>
+    <span class="n">doPush</span><span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">ans</span> <span class="o">=</span> <span class="o">-</span><span class="n">INF</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ans</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="n">tree</span><span class="p">[</span><span class="n">l</span><span class="o">++</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ans</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="n">tree</span><span class="p">[</span><span class="o">--</span><span class="n">r</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">l</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">r</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>В более сложных случаях (к примеру, поиска суммы на отрезке) для пересчета значения в функции <code>apply</code> может понадобиться длина отрезка текущей вершины. Это тоже легко можно поддерживать. На $k$-м снизу уровне (нумерация с нуля) длина отрезка равна $2^k$. И в случае, когда мы идем снизу вверх, и в случае, когда мы идем сверху вниз легко поддерживать эту величину.</p>
+<h2 id="задачи-для-практики">Задачи для практики</h2>
+<p>Можно потренироваться в первую очередь на любых задачах на дерево отрезков, коих существует бесчисленное количество.</p>
+<p>К примеру, можно воспользоваться следующими задачами:</p>
+<ul>
+<li>
+<p><a href="https://informatics.msk.ru/mod/statements/view.php?id=597&amp;chapterid=752#1">Задача</a> на поиск максимума на отрезке.</p>
+</li>
+<li>
+<p><a href="https://cses.fi/problemset/task/1735">Задача</a> на прибавление на отрезке, присвоение на отрезке и поиск суммы на отрезке.</p>
+</li>
+<li>
+<p><a href="https://cses.fi/problemset/task/1736">Задача</a> на прибавление арифметической прогрессии на отрезке.</p>
+</li>
+<li>
+<p>Чуть более продвинутая <a href="https://codeforces.com/contest/446/problem/C">задача</a> на дерево отрезков.</p>
+</li>
+<li>
+<p>ОСТОРОЖНО! СПОЙЛЕРЫ К РОИ! <a href="https://contest.yandex.ru/roiarchive/contest/4284/problems/7/">Эту задачу</a> можно очень просто сдать на высокий балл при помощи дерева отрезков снизу. Такое решение ваигрывает у разреженных таблиц не смотря на то, что они отвечают на запрос за $O(1)$.</p>
+</li>
+</ul>
+
+        
+      </div>
+      <div class="paginator">
+        
+        <a class="link" href="https://peltorator.ru/try_web/post/sparse_table/">← prev</a>
+        
+        
+        <a class="link" href="https://peltorator.ru/try_web/post/segment_tree_beats/">next →</a>
+        
+      </div>
+      <div class="comment">
+        
+        
+        
+        
+      </div>
+      
+    </main>
+    <footer id="footer">
+  <div>
+    <span>© 2021</span> - <span>2021</span>
+  </div>
+
+  <div>
+    <span>Powered by </span>
+    <a class="link" href="https://gohugo.io/">Hugo</a>
+    <span> 🍦 Theme </span>
+    <a class="link" href="https://github.com/queensferryme/hugo-theme-texify">TeXify</a>
+  </div>
+
+  <div class="footnote">
+    <span></span>
+  </div>
+</footer>
+
+  </div>
+  
+
+
+
+
+
+</body>
+
+</html>

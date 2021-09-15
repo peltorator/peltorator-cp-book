@@ -72,18 +72,14 @@ $$
 =  N^c \int\limits_{1}^{\sqrt{N}} a^{-2c} \cdot (3c - 1) \cdot (1 - const_1) \ \mathrm{d}a \le
 $$
 
-![обращения Мёбиуса](/try_web/images/powerful_number_sieve_cases.png)
-
 $$
 \le (3c - 1)N^c\int\limits_{1}^{\sqrt{N}} a^{-2c} \  \mathrm{d}a\leq
 \begin{cases}
-    (1 - 2c)(3c - 1)N^c\cdot N^{1/2 - c} = O(\sqrt{N}), & c < \frac{1}{2}, \\
-    (3c - 1)N^c\ln\sqrt{N} = O(\sqrt{N}\log{n}), & c = \frac{1}{2}, \\
+    (1 - 2c)(3c - 1)N^c\cdot N^{1/2 - c} = O(\sqrt{N}), & c < \frac{1}{2}, \\\\
+    (3c - 1)N^c\ln\sqrt{N} = O(\sqrt{N}\log{n}), & c = \frac{1}{2}, \\\\
     (3c - 1)(2c - 1)N^c = O(T_{s_g}(N)), & c > \frac{1}{2}.
 \end{cases}
 $$
-
-<span style="color:red">TODO: Почему-то *cases* окружение из LaTeX не отображается в Markdown</span>
 
 
 Где $const_1$ — какое-то положительное число.

@@ -20,7 +20,7 @@ draft: false
 
 Взятие двух многочленов по модулю можно реализовать за $O(k \log k)$. Тогда асимптотика алгоритма получается $O\left(k \log k + \frac{k}{2} \log \left( \frac{k}{2} \right) + \frac{k}{4} \log \left(\frac{k}{4} \right) + \ldots\right) = O\left(\left(k + \frac{k}{2} + \frac{k}{4} + \ldots\right) \log k\right) = O(k \log k)$. Что и требовалось.
 
-Чтобы получить алгоритм, который работает при $n \ge p$, нужно просто применить алгоритм из предыдущего раздела, однако вычислять $b!$ с помощью нового метода. $b < p$, поэтому это вычисление будет работать не дольше $\sqrt{p} \log p$. Всего итераций будет $\log_p n$, так что асимптотика получается $O(\sqrt{p} \log p \cdot \log_p n) = O\left(\sqrt{p} \log p \frac{\log n}{\log p}\right) = O\left(\sqrt{p} \log n\right)$. Если объединить случаи $p < n$ и $p \ge n$, получается время работы $O\left(\sqrt{\min (p, n)} \log n\right)$.
+Чтобы получить алгоритм, который работает при $n \ge p$, нужно просто применить алгоритм из [предыдущего раздела](/try_web/post/mod_factorial/), однако вычислять $b!$ с помощью нового метода. $b < p$, поэтому это вычисление будет работать не дольше $\sqrt{p} \log p$. Всего итераций будет $\log_p n$, так что асимптотика получается $O(\sqrt{p} \log p \cdot \log_p n) = O\left(\sqrt{p} \log p \frac{\log n}{\log p}\right) = O\left(\sqrt{p} \log n\right)$. Если объединить случаи $p < n$ и $p \ge n$, получается время работы $O\left(\sqrt{\min (p, n)} \log n\right)$.
 
 ## Задачи для практики
 
