@@ -81,7 +81,7 @@ $$g(n) = \sum \limits_{d | n} f(d)$$
      $$ = \sum \limits_{d, d' : (d \cdot d') | n} \mu(d') \cdot f(d) = 
      \sum \limits_{d | n} f(d) \left (\sum \limits_{d' | \frac{n}{d}} \mu(d') \right ) =
      \text{\graytext{/ по примеру 3 /}}
-    = \sum \limits_{d | n} f(d) \chi_1(\frac{n}{d}) = f(n)$$
+    = \sum \limits_{d | n} f(d) \chi_1\left(\frac{n}{d}\right) = f(n)$$
 
     Последнее равенство верно, потому что у всех слагаемых кроме $d = n$ будет множитель $0$.
 
@@ -116,7 +116,6 @@ $\sum \limits_{d | n} \mu(d) g \left ( \frac{n}{d} \right )$ является ч
 \end{definition}
 
 \begin{observation}
-    \label{Mobius: dirform}
     Тогда формулу обращения Мёбиуса можно коротко записать как
 
     $$
@@ -135,6 +134,7 @@ $\sum \limits_{d | n} \mu(d) g \left ( \frac{n}{d} \right )$ является ч
 \end{observation}
 
 \begin{properties}
+    \label{Mobius: dirform}
 
     1. $(f * g) * h = f * (g * h)$.
 
