@@ -46,6 +46,7 @@
 
 <script src="https://tikzjax.com/v1/tikzjax.js"></script>
 <script src="https://tikzwolke.com/v1/tikzwolke.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 
 <link rel="canonical" href="https://peltorator.ru/try_web/">
@@ -85,6 +86,21 @@
 
     <main id="main" class="index">
       
+      
+      <div class="post">
+        <h2>
+          <a href="https://peltorator.ru/try_web/post/discrete_log/">Дискретное логарифмирование</a>
+          <time>2021-09-14</time>
+        </h2>
+        
+        <div class="content">
+          
+          Даны числа $a$, $b$ и $m$. Необходимо найти такой $x$, что $a^x = b \mod m$. При этом $gcd(a, m) = 1$, но $m$ не обязано быть простым.
+Ответ есть не всегда, к примеру, при $a = 1$ и $b \neq 1$.
+Сделаем корневую декомпозицию. Известно, что $x \in [0, m - 1]$. Пусть $k = \left\lfloor \sqrt{m} \right\rfloor$. Посчитаем числа вида $a^{k n}$ для $0 \le n \le \left\lceil \sqrt{m} \right\rceil $ и положим их в unordered_map.
+          
+        </div>
+      </div>
       
       <div class="post">
         <h2>
@@ -144,19 +160,6 @@
         <div class="content">
           
           Часто в задачах бывает необходимо искать $n! \bmod p$. Обычно модуль — это большое число, а $n$ не очень большое, поэтому можно просто заранее предпосчитать все факториалы. Однако иногда бывает обратная ситуация: $p &lt; n$. С первого взгляда кажется, что это бессмысленная задача: в $n!$ в таком случае входит число $p$, поэтому $n! \bmod p = 0$. Но часто нас не устраивает такой ответ, потому что нам часто нужно делить факториалы друг на друга.
-          
-        </div>
-      </div>
-      
-      <div class="post">
-        <h2>
-          <a href="https://peltorator.ru/try_web/post/all_mod_inv/">Нахождение обратных ко всем остаткам за $O(p)$</a>
-          <time>2021-09-13</time>
-        </h2>
-        
-        <div class="content">
-          
-          Часто бывает так, что в задаче нужно делить по модулю много раз. Это можно делать обычным алгоритмом взятия обратного по модулю за $O(\log p)$ на запрос. Если мы сделаем $n$ запросов, то асимптотика будет $O(n \log p)$. Сейчас мы рассмотрим алгоритм, который изначально предпосчитает обратные ко всем остаткам за $O(p)$, и тогда на запросы мы будем отвечать за $O(1)$. Если $n$ порядка $p$ или больше, то этот вариант будет более эффективен.
           
         </div>
       </div>

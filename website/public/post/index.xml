@@ -6,7 +6,349 @@
     <description>Recent content in Posts on peltorator</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ru</language>
-    <lastBuildDate>Wed, 15 Sep 2021 17:59:03 +0300</lastBuildDate><atom:link href="https://peltorator.ru/try_web/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 21 Sep 2021 11:52:23 +0300</lastBuildDate><atom:link href="https://peltorator.ru/try_web/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Обращение Мёбиуса, свертка Дирихле</title>
+      <link>https://peltorator.ru/try_web/post/mobius_convolution/</link>
+      <pubDate>Tue, 21 Sep 2021 11:52:23 +0300</pubDate>
+      
+      <guid>https://peltorator.ru/try_web/post/mobius_convolution/</guid>
+      
+      <description>&lt;!--- TODO: упростить доказательства---&gt;
+&lt;p&gt;Рассмотрим различные свертки функций. Функции мы будем рассматривать арифметические, то есть действующие из $\mathbb{N}$ в $\mathbb{N}$, $\mathbb{Z}$, $\mathbb{R}$ или $\mathbb{C}$.
+В каком-то смысле можно думать про арифметические функции как про последовательности чисел:
+$f(1), f(2), \ldots, f(n), \ldots$&lt;/p&gt;
+&lt;p&gt;Возможно, вам уже знакомы некоторые свертки. К примеру, свертка умножения:&lt;/p&gt;
+&lt;p&gt;$$c_n = \sum \limits_{k = 0}^{n} a_k \cdot b_{n - k} \textcolor{gray}{\text{  / здесь последовательности нумеруются с нуля /}}$$&lt;/p&gt;
+&lt;p&gt;Быстрое преобразование Фурье как раз строит по последовательностям $a$ и $b$ их свертку умножения.&lt;/p&gt;
+&lt;p&gt;В этом разделе мы рассмотрим несколько примеров других сверток.&lt;/p&gt;
+&lt;h2 id=&#34;формула-обращения-мёбиуса&#34;&gt;Формула обращения Мёбиуса&lt;/h2&gt;
+&lt;p&gt;Часто бывает так, что две функции связаны между собой следующим отношением:&lt;/p&gt;
+&lt;p&gt;$$g(n) = \sum \limits_{d | n} f(d)$$&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;color:gray&#34;&gt;/ Запись $d | n$ означает &amp;laquo;$d$ делит $n$&amp;raquo;, то есть сумма берется по всем делителям числа $n$ /&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Определение:&lt;/strong&gt;
+Функция Мёбиуса.&lt;/p&gt;
+&lt;p&gt;$$\mu(n) = \begin{cases}
+0, \text{ если $n$ не свободно от квадратов,} \\&lt;br&gt;
+(-1)^k, \text{ если $n$ свободно от квадратов, и у него ровно $k$ простых делителей}
+\end{cases}$$&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;color:gray&#34;&gt;/ Число свободно от квадратов, если все простые входят в его разложение в степени ровно один /&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Количество делителей числа: $\tau(n) = \sum \limits_{d | n} 1$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Сумма делителей числа: $\sigma(n) = \sum \limits_{d | n} d$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Функция, которая равна единице в единице и нулю во всех остальных натуральных числах:
+$\chi_1 = \sum \limits_{d | n} \mu(d)$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+3. Пусть $n = p_1^{\alpha_1} \cdot p_2^{\alpha_2} \cdot \ldots \cdot p_k^{\alpha_k}$.
+Если $\mu(d) \neq 0$, то каждую $p$-шку мы взяли в него либо в нулевой степени, либо в первой.
+Тогда есть $\sum \limits_{i = 0}^{\left\lfloor \frac{k}{2} \right\rfloor} {k \choose 2i}$ $d$-шек, для которых $\mu(d) = 1$
+и $\sum \limits_{i = 0}^{\left\lfloor \frac{k-1}{2} \right\rfloor} {k \choose 2i + 1}$ $d$-шек, для которых $\mu(d) = -1$.
+А такие суммы равны при $n &amp;gt; 1$ (сумма четных биномиальных коэффициентов равна сумме нечетных), так что вся сумма равна нулю.
+При $n = 1$ легко произвести подстановку и проверить, что $\chi_1(1) = 1$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Определение:&lt;/strong&gt;
+Функция Эйлера $\varphi(n)$ — это количество чисел, не больших $n$, которые взаимно просты с $n$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Есть формула для функции Эйлера, которая имеет похожий вид:&lt;/p&gt;
+&lt;p&gt;$\varphi(n) = n \prod \limits_{p | n} (1 - \frac{1}{p})$,
+где произведение берется по всем простым делителям $n$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Теорема:&lt;/strong&gt; &lt;strong&gt;Формула обращения Мёбиуса&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Пусть $f$ и $g$ — арифметические функции. Тогда&lt;/p&gt;
+&lt;p&gt;$g(n) = \sum \limits_{d | n} f(d) \Leftrightarrow f(n) = \sum \limits_{d | n} \mu(d) g \left (\frac{n}{d} \right )$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+$$\sum \limits_{d | n} \mu(d) g \left (\frac{n}{d} \right ) =
+\textcolor{gray}{\text{/ по левой формуле, которая у нас уже есть /}} = $$&lt;/p&gt;
+&lt;p&gt;$$ = \sum \limits_{d | n} \mu(d)  \left (\sum \limits_{d&#39; | \frac{n}{d}} f(d&#39;) \right ) =
+\sum \limits_{d, d&#39; : (d \cdot d&#39;) | n} \mu(d) \cdot f(d&#39;) =
+\textcolor{gray}{\text{/ поменяем местами обозначения /}} = $$&lt;/p&gt;
+&lt;p&gt;$$ = \sum \limits_{d, d&#39; : (d \cdot d&#39;) | n} \mu(d&#39;) \cdot f(d) =
+\sum \limits_{d | n} f(d) \left (\sum \limits_{d&#39; | \frac{n}{d}} \mu(d&#39;) \right ) =
+\textcolor{gray}{\text{/ по примеру 3 /}}
+= \sum \limits_{d | n} f(d) \chi_1\left(\frac{n}{d}\right) = f(n)$$&lt;/p&gt;
+&lt;p&gt;Последнее равенство верно, потому что у всех слагаемых кроме $d = n$ будет множитель $0$.&lt;/p&gt;
+&lt;p&gt;В обратную сторону аналогично. Нужно тоже подставить.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+Подставим в эту формулу примеры выше:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;$1 = \sum \limits_{d | n} \mu(d) \tau \left ( \frac{n}{d} \right )$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$n = \sum \limits_{d | n} \mu(d) \sigma \left ( \frac{n}{d} \right )$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$\mu(n) = \sum \limits_{d | n} \mu(d) \chi_1 \left ( \frac{n}{d} \right )$ (что очевидно, но показывает, что формула из третьего примера является частным случаем формулы обращения Мёбиуса).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+Существует такое тождество: $n = \sum \limits_{d | n} \varphi(d)$. Применим формулу обращения Мёбиуса и получим, что
+$\varphi(n) = \sum \limits_{d | n} \mu(d) \cdot \frac{n}{d}$.&lt;/p&gt;
+&lt;p&gt;Неожиданно получили связь функций Эйлера и Мёбиуса.&lt;/p&gt;
+&lt;h2 id=&#34;свертка-дирихле&#34;&gt;Свертка Дирихле&lt;/h2&gt;
+&lt;p&gt;$\sum \limits_{d | n} \mu(d) g \left ( \frac{n}{d} \right )$ является частным случаем свертки Дирихле:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Определение:&lt;/strong&gt;
+Свертка Дирихле двух арифметических функций определяется следующим образом:&lt;/p&gt;
+&lt;p&gt;$(f * g)(n) = \sum \limits_{d | n} f(d) g \left ( \frac{n}{d} \right ) = \sum \limits_{ab = n} f(a) g(b)$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Тогда формулу обращения Мёбиуса можно коротко записать как&lt;/p&gt;
+&lt;p&gt;$$
+g = f * 1 \Leftrightarrow f = g * \mu
+$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Определение:&lt;/strong&gt;
+Арифметическая функция $f$ называется мультипликативной, если
+$f(a \cdot b) = f(a) \cdot f(b) \ \forall \ a, b \in \mathbb{N}$, таких что $gcd(a, b) = 1$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+$\mu, \varphi, \tau, \sigma, \chi_1, id, 1$ — мультипликативные арифметические функции.
+&lt;span style=&#34;color:gray&#34;&gt;/ 1 — это фунция, равная единице во всех точках /&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Свойства:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;$(f * g) * h = f * (g * h)$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$f * g = g * f$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$f * (g + h) = f * g + f * h$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$f * \chi_1 = \chi_1 * f = f$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;$f * 0 = 0 * f = 0$ ($0$ — это функция, которая всегда равна нулю).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Если $f$ и $g$ — мультипликативные, то $f * g$ тоже является мультипликативной.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+1-5. Очевидно. Проверяется подстановкой.&lt;/p&gt;
+&lt;ol start=&#34;6&#34;&gt;
+&lt;li&gt;$gcd(n, m)=1$, $(f*g)(n \cdot m) =  \sum \limits_{d|n \cdot m} f(d)g(\frac{n \cdot m}{d}) = $
+&lt;span style=&#34;color:gray&#34;&gt;/ здесь мы пользуемся тем, что числа взаимно просты; иначе мы бы получили сумму с повторениями /&lt;/span&gt;
+$= \sum \limits_{d_1|n, d_2|m} f(d_1 \cdot d_2) g(\frac{n \cdot m}{d_1 \cdot d_2}) =$
+&lt;span style=&#34;color:gray&#34;&gt;/ а здесь тем, что числа делители взаимно простых чисел взаимно просты /&lt;/span&gt;
+$=\sum \limits_{d_1|n, d_2|m} f(d_1) f(d_2) g(\frac{n}{d_1}) g(\frac{m}{d_2}) = $
+$\left(\sum \limits_{d_1|n} f(d_1) g(\frac{n}{d_1})\right) \cdot \left(\sum \limits_{d_2|m} f(d_2) g(\frac{m}{d_2})\right) = (f * g)(n) \cdot (f * g)(m)$.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Получили, что арифметические функции образуют коммутативное кольцо с единицей относительно свертки Дирихле и поточечного сложения.
+Нулем в этом кольце является тождественно нулевая функция, а единицей — функция $\chi_1$. Это кольцо называется &lt;strong&gt;кольцом Дирихле&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+a. $\tau = 1 * 1$.&lt;/p&gt;
+&lt;p&gt;b. $\sigma = id * 1$.&lt;/p&gt;
+&lt;p&gt;c. $\chi_1 = 1 * \mu$.&lt;/p&gt;
+&lt;p&gt;d. $1 = \tau * \mu$.&lt;/p&gt;
+&lt;p&gt;e. $id = \sigma * \mu$.&lt;/p&gt;
+&lt;p&gt;f. $id = \varphi * 1$.&lt;/p&gt;
+&lt;p&gt;g. $\sigma = \varphi * \tau$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Определение:&lt;/strong&gt;
+Обращением Дирихле функции $f$ назовем такую функцию $g$, что
+$f * g = \chi_1$, то есть функция $g = f^{-1}$ в кольце Дирихле.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Теорема:&lt;/strong&gt;
+$\ \forall \ f : f(1) \neq 0 \ \exists \ g : f * g = \chi_1$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+$g(1) = \frac{1}{f(1)}$.&lt;/p&gt;
+&lt;p&gt;А для $n &amp;gt; 1$ функцию $g$ можно вычислить рекурсивно:&lt;/p&gt;
+&lt;p&gt;$g(n) = -\frac{1}{f(1)} \sum \limits_{d | n, d \neq n} f(\frac{n}{d}) g(d)$.&lt;/p&gt;
+&lt;p&gt;Доказывается, что такая функция подходит, домножением на $f(1)$ и переносом всего в левую часть.&lt;/p&gt;
+&lt;h2 id=&#34;поиск-количества-пар-взаимнопростых-не-больших-n&#34;&gt;Поиск количества пар взаимнопростых, не больших $n$&lt;/h2&gt;
+&lt;p&gt;Зачем это все нужно?
+Рассмотрим, как решать задачи при помощи обращения Мёбиуса и свертки Дирихле.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Обозначение:&lt;/strong&gt;
+$[P]$ — это функция, которая равна единице, если $P$ верно, и нулю, если $P$ неверно.&lt;/p&gt;
+&lt;p&gt;Давайте сначала разберемся, как пользоваться линейным решетом Эратосфена.
+Можно считать мультипликативную функцию $f$ для всех чисел от $1$ до $n$ за $O(n)$, если за $O(1)$ можно находить $f(p^k)$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+Дано число $n$. Надо найти количество упорядоченных пар взаимно простых чисел $x, y \le n$.&lt;/p&gt;
+&lt;p&gt;Обозначим ответ за $f(n)$.&lt;/p&gt;
+&lt;p&gt;Сначала заметим, что  $f(n) = 2 \cdot \sum \limits_{k = 1}^{n} \varphi(k) - 1$, потому что каждую неупорядоченную пару
+$x, y$ мы посчитаем один раз в $\varphi(max(x, y))$, а нам надо посчитать упорядоченные пары, поэтому необходимо умножить на $2$. Осталось вычесть
+пары из двух одинаковых чисел. Но число взаимно просто с собой только если оно равно единице. Этой формулы нам уже хватит на самом деле, но давайте придумаем альтернативную, потому что в более сложных случаях все будет аналогично.&lt;/p&gt;
+&lt;p&gt;Запишем формулу: $f(n) = \sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} [gcd(i, j) = 1]$.
+Заметим, что $[gcd(i, j) = 1] = \chi_1(gcd(i, j))$, так что можно применить свертку Мёбиуса:&lt;/p&gt;
+&lt;p&gt;$$\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} \sum \limits_{d | gcd(i, j)} \mu(d) =
+\sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} \sum \limits_{d = 1}^{n} [d | gcd(i, j)] \cdot \mu(d) = $$&lt;/p&gt;
+&lt;p&gt;$$ = \sum \limits_{i = 1}^{n} \sum \limits_{j = 1}^{n} \sum \limits_{d = 1}^{n} [d | i] \cdot [d | j] \cdot \mu(d) =
+\textcolor{gray}{\text{/ меняем порядок суммирования /}} = $$&lt;/p&gt;
+&lt;p&gt;$$= \sum \limits_{d = 1}^{n} \mu(d) \left ( \sum \limits_{i = 1}^{n} [d | i] \right )
+\left ( \sum \limits_{j = 1}^{n} [d | j] \right)$$&lt;/p&gt;
+&lt;p&gt;При этом $\sum \limits_{i = 1}^{n} [d | i] = \sum \limits_{j = 1}^{n} [d | j] = $ количеству чисел, делящихся на $d$,
+то есть $\left\lfloor \frac{n}{d}  \right\rfloor$.
+Тогда получается, что
+$f(n) = \sum \limits_{d = 1}^{n} \mu(d) \cdot \left\lfloor \frac{n}{d} \right\rfloor^2$.&lt;/p&gt;
+&lt;p&gt;А эту формулу можно посчитать уже за линейное время (все значения $\mu$ считаются при помощи линейного решета за
+$O(n)$).&lt;/p&gt;
+&lt;p&gt;Нырнем глубже! Мы хотим еще быстрее.
+Пусть у нас есть некоторая мультипликативная функция $f$, и мы хотим посчитать ее префиксную сумму.
+Обозначим $s_f(n) = \sum \limits_{k = 1}^{n} f(k)$.
+Предположим, что мы обнаружили такую мультипликативную функцию $g$, что $s_g$ и $s_{f * g}$ можно быстро считать. Тогда научимся быстро считать $s_f$:&lt;/p&gt;
+&lt;p&gt;$$s_{f * g}(n) = \sum \limits_{k = 1}^{n} \sum \limits_{d | k} g(d) f \left ( \frac{k}{d} \right ) =
+\sum \limits_{d = 1}^{n} g(d) \sum \limits_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} f(k) = $$&lt;/p&gt;
+&lt;p&gt;$$=g(1) \sum \limits_{k = 1}^{n} f(k) +
+\sum \limits_{d = 2}^{n} g(d) \sum \limits_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} f(k) =
+g(1) s_f(n) + \sum \limits_{d = 2}^{n} g(d) s_f\left(\left\lfloor \frac{n}{d} \right\rfloor\right)$$&lt;/p&gt;
+&lt;p&gt;Теперь перенесем $s_f(n)$ в одну часть, а все остальное в другую:&lt;/p&gt;
+&lt;p&gt;$$s_f(n) = \frac{s_{f * g}(n) - \sum_{d = 2}^{n} s_f \left ( \left\lfloor \frac{n}{d} \right\rfloor \right ) g(d)}{g(1)}$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;
+Обратите внимание, что если $g$ — мультипликативная функция, то $g(k) = g(1) \cdot g(k)$ для любого $k$, поэтому если $g$ — это не тождественный ноль, то $g(1) = 1$, так что делить на знаменатель нам не придется.&lt;/p&gt;
+&lt;p&gt;Осталось научиться быстро считать сумму в числителе.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Лемма:&lt;/strong&gt;
+Среди чисел $\left\lfloor \frac{n}{1} \right\rfloor, \left\lfloor \frac{n}{2} \right\rfloor, \ldots,
+\left\lfloor \frac{n}{n} \right\rfloor$ не более $2 \sqrt{n}$ различных.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+Стандартное доказательство. Есть $\sqrt{n}$ чисел вида $\left\lfloor \frac{n}{d} \right\rfloor$, где $d &amp;lt; \sqrt{n}$,
+а для $d \ge \sqrt{n}$ будет выполнено $\left\lfloor \frac{n}{d} \right\rfloor \le \sqrt{n}$, поэтому
+среди них тоже не больше, чем $\sqrt{n}$ различных.&lt;/p&gt;
+&lt;p&gt;Также есть простой алгоритм перебора отрезков одинаковых значений $\left\lfloor \frac{n}{d} \right\rfloor$:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;left&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;left&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;left&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;right&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;// in [left; right) values of n/d are equal
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Из леммы следует, что сумма в числителе разбивается на $O(\sqrt{n})$ рекурсивных вызовов
+$s_f(\left\lfloor \frac{n}{d} \right\rfloor)$ и подсчетов $g$ на отрезке, но сумма $g$ на отрезке — это разность
+двух префиксных сумм, которые мы по предположению задачи умеем быстро считать.&lt;/p&gt;
+&lt;p&gt;Получился рекурсивный алгоритм. Соптимизируем его, сохраняя уже посчитанные значения $s_f(k)$ в хеш-таблицу,
+чтобы не считать их заново.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Лемма:&lt;/strong&gt;
+Пусть $a$, $b$ и $c$~ — натуральные числа. Тогда&lt;/p&gt;
+&lt;p&gt;$$\left\lfloor \frac{\left\lfloor \frac{a}{b} \right\rfloor}{c} \right\rfloor = \left\lfloor \frac{a}{bc} \right\rfloor$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+Очевидно, что $0 \le \frac{a}{b} - \left\lfloor \frac{a}{b} \right\rfloor &amp;lt; 1$,
+поэтому $0 \le \frac{a}{bc} - \frac{\left\lfloor \frac{a}{b} \right\rfloor}{c} &amp;lt; \frac{1}{c}$.
+При этом $\left\lfloor \frac{a}{b} \right\rfloor$ — целое число, поэтому
+дробная часть $\frac{\left\lfloor \frac{a}{b} \right\rfloor}{c}$ не больше $\frac{c - 1}{c}$, так что при прибавлении
+чего-то меньшего, чем $\frac{1}{c}$, мы не перепрыгнем на следующюю целую часть.&lt;/p&gt;
+&lt;p&gt;Из леммы слеудет, что за время алгоритма мы посетим только числа вида $\left\lfloor \frac{n}{d} \right\rfloor$,
+потому что $\left\lfloor \frac{\left\lfloor \frac{n}{d_1} \right\rfloor}{d_2} \right\rfloor =
+\left\lfloor \frac{n}{d_1 d_2} \right\rfloor$.&lt;/p&gt;
+&lt;p&gt;Подсчет $s_f(k)$ занимает $O(\sqrt{k})$ времени + рекурсивные вызовы.
+Так что итоговая асимптотика будет равна&lt;/p&gt;
+&lt;p&gt;$$O\left(\sum \limits_{k = 1}^{n} \sqrt{\left\lfloor \frac{n}{k} \right\rfloor}\right)
+\textcolor{gray}{\text{/ сумма берется по различным значениям /}}
+\le O\left(\sum \limits_{k = 1}^{\sqrt{n}} \sqrt{k} + \sum \limits_{k = 1}^{\sqrt{n}} \sqrt{\frac{n}{k}}\right)$$&lt;/p&gt;
+&lt;p&gt;Когда в асимптотике есть сумма возрастающей/убывающей функции, эту сумму можно заменить на интеграл без потерь.&lt;/p&gt;
+&lt;p&gt;$\sum \limits_{k = 1}^{\sqrt{n}} \sqrt{k} \sim \int \limits_{1}^{\sqrt{n}} \sqrt{k} dk = \frac{2}{3} k^{\frac{3}{2}} |_1^{\sqrt{n}} =
+O(n^{\frac{3}{4}})$&lt;/p&gt;
+&lt;p&gt;$\sum \limits_{k = 1}^{\sqrt{n}} \sqrt{\frac{n}{k}} \sim \int \limits_{1}^{\sqrt{n}} \sqrt{\frac{n}{k}} dk = $
+$2 \sqrt{nk} |_1^{\sqrt{n}} = O(n^{\frac{3}{4}})$&lt;/p&gt;
+&lt;p&gt;Получили, что асимптотика — $O(n^{\frac{3}{4}})$.&lt;/p&gt;
+&lt;p&gt;Самое время вспомнить о том, что функция $f$ мультипликативная.
+А для мультипликативных функций мы умеем считать ее первые $k$ значений за $O(k)$ при помощи линейного решета Эратосфена.
+Тогда и префиксные суммы мы тоже можем посчитать за $O(k)$.
+Пусть мы предпосчитали префиксные суммы для первых $k \ge \sqrt{n}$ чисел.
+Тогда нам надо брать сумму времени работы только для таких $\left\lfloor \frac{n}{d} \right\rfloor$, которые больше $k$.
+Получаем асимптотику
+$O(k + \sum \limits_{i = 1}^{\frac{n}{k}} \sqrt{\frac{n}{i}}) = O(k + \frac{n}{\sqrt{k}})$
+(этот интеграл мы уже брали, надо подставить только в другой точке).
+Минимума эта величина достигает при $k = O(n^{\frac{2}{3}})$ (сумма возрастающей и убывающей функций достигает асимптотического минимума в точке пересечения). В этом случае асимптотика получается равна $O(n^{\frac{2}{3}})$.&lt;/p&gt;
+&lt;p&gt;Ура, мы научились искать префиксную сумму мультипликативной функции $f$ за $O(n^{\frac{2}{3}})$, если
+есть такая функция $g$, что $s_g$ и $s_{f * g}$ мы умеем считать за $O(1)$.&lt;/p&gt;
+&lt;p&gt;Откуда же взять эту функцию $g$? Мы знаем несколько примеров таких функций: $\chi_1, id, 1$ и так далее.
+Надо поперебирать эти функции, пока их свертка с $f$ не получится равной тоже какой-то простой функции.
+Если не нашлось, то очень жаль, ничего не получилось.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+Вернемся к нашей задаче поиска количества упорядоченных пар взаимно простых чисел $x, y \le n$.&lt;/p&gt;
+&lt;p&gt;Мы уже выяснили, что $f(n) = \sum \limits_{d = 1}^{n} \mu(d) \left\lfloor \frac{n}{d} \right\rfloor^2$.
+Как мы уже поняли, среди чисел вида $\left\lfloor \frac{n}{d} \right\rfloor$ всего $\sqrt{n}$ различных.
+А $\mu$ является мультипликативной функцией, при этом
+$\mu * 1 = \chi_1$. Так что сумму $\mu$ на отрезке мы умеем считать быстро.
+Посмотрим, в каких точках $m$ нам надо будет считать $s_{\mu}(m)$.
+Это будут такие $m$, что на них число $\left\lfloor \frac{n}{m} \right\rfloor$ увеличилось.
+Нетрудно понять, что это будут как раз числа вида $\left\lfloor \frac{n}{k} \right\rfloor$.
+Поэтому нам надо будет посчитать $s_{\mu}$ ровно в точках вида $\left\lfloor \frac{n}{k} \right\rfloor$,
+а это мы умеем делать суммарно за $O(n^{\frac{2}{3}})$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+$\varphi * 1 = id$. Так что $s_{\varphi}$ тоже можно считать за $O(n^{\frac{2}{3}})$. И в действительности в данном случае нам этого достаточно, потому что мы с самого начала выразили количество пар взаимно простых через префиксные суммы $\varphi$.&lt;/p&gt;
+&lt;h2 id=&#34;сумма-попарных-нодов-чисел-не-больших-n&#34;&gt;Сумма попарных НОДов чисел, не больших $n$&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+Дано число $n$. Надо найти&lt;/p&gt;
+&lt;p&gt;$$\sum_{i = 1}^n \sum_{j = 1}^n gcd(i, j)$$&lt;/p&gt;
+&lt;p&gt;То есть сумму попарных НОДов всех чисел, которые не больше $n$.&lt;/p&gt;
+&lt;p&gt;Давайте воспользуемся похожими на пример с парами взаимно простых свойствами. Давайте перебирать этот самый НОД $d$ от $1$ до $n$ и считать количество пар чисел, у которых НОД равен $d$. Если НОД равен $d$, то точно оба числа $i$ и $j$ делятся на $d$, однако если мы поделим их на $d$ и получим числа $i&#39;$ и $j&#39;$, то эти два числа уже взаимно просты. Поэтому на самом деле количество пар чисел $i$ и $j$, НОД которых равен $d$, совпадает с количеством пар чисел $i&#39;$ и $j&#39;$, которые не больше $\left\lfloor \frac{n}{d} \right\rfloor$, и при этом взаимно просты. А это как раз $f(\left\lfloor \frac{n}{d} \right\rfloor)$ в обозначениях прошлого примера. То есть формула получается такая:&lt;/p&gt;
+&lt;p&gt;$$\sum_{d = 1}^{n} d \cdot f(\left\lfloor \frac{n}{d} \right\rfloor)$$&lt;/p&gt;
+&lt;p&gt;Как и раньше, мы знаем, что $\left\lfloor \frac{n}{d} \right\rfloor$ меняется не очень часто, поэтому есть $\sqrt{n}$ отрезков равенства, на которых нужно один раз посчитать $f$, а также высчитать сумму $d$ на отрезке. Так же, как и в примере с $\mu$ в прошлый раз, вызов $f(n)$ посчитает сразу же все нужные нам значения $f$, поэтому итоговая асимптотика будет $O(n^{\frac{2}{3}})$.&lt;/p&gt;
+&lt;h2 id=&#34;сумма-попарных-ноков-чисел-не-больших-n&#34;&gt;Сумма попарных НОКов чисел, не больших $n$&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Пример:&lt;/strong&gt;
+Дано число $n$. Надо найти&lt;/p&gt;
+&lt;p&gt;$$\sum_{i = 1}^n \sum_{j = 1}^n lcm(i, j)$$&lt;/p&gt;
+&lt;p&gt;То есть сумму попарных НОКов всех чисел, которые не больше $n$.&lt;/p&gt;
+&lt;p&gt;В этом нам поможет следующий общеизвестный факт:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;$$a \cdot b = gcd(a, b) \cdot lcm(a, b)$$&lt;/p&gt;
+&lt;p&gt;Давайте запишем нашу сумму как обычно:&lt;/p&gt;
+&lt;p&gt;$$
+\sum_{i = 1}^{n} \sum_{j = 1}^{n} \sum_{c = 1}^{n} c \cdot [lcm(i, j) = c] = \textcolor{gray}{\text{/ По замечанию выше /}} = \sum_{i = 1}^{n} \sum_{j = 1}^{n} \sum_{d = 1}^{n} \frac{i \cdot j}{d} \cdot [gcd(i, j) = d] =
+$$&lt;/p&gt;
+&lt;p&gt;$$
+= \textcolor{gray}{\text{/ $i&#39; = \frac{i}{d}$ и $j&#39; = \frac{j}{d}$ /}} = \sum_{d = 1}^{n} \sum_{i&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \sum_{j&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \frac{i&#39; \cdot d \cdot j&#39; \cdot d}{d} \cdot [gcd(i&#39;, j&#39;) = 1] =
+\sum_{d = 1}^{n} \sum_{i&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \sum_{j&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} i&#39; \cdot d \cdot j&#39; \cdot \chi_1(gcd(i&#39;, j&#39;)) =
+$$&lt;/p&gt;
+&lt;p&gt;$$
+= \textcolor{gray}{\text{/ по формуле для $\chi_1$, доказанной в примерах в начале статьи /}} =
+\sum_{d = 1}^{n} \sum_{i&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \sum_{j&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} i&#39; \cdot d \cdot j&#39; \sum_{k | gcd(i&#39;, j&#39;)} \mu(k) = $$&lt;/p&gt;
+&lt;p&gt;$$ = \sum_{d = 1}^{n} \sum_{i&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \sum_{j&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} i&#39; \cdot d \cdot j&#39; \sum_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} [k | i&#39;] \cdot [k | j&#39;] \cdot \mu(k) =
+$$&lt;/p&gt;
+&lt;p&gt;$$
+= \sum_{d = 1}^{n} d \sum_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \mu(k) \cdot \left ( \sum_{i&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} i&#39; \cdot [k | i&#39;] \right ) \cdot \left ( \sum_{j&#39; = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} j&#39; \cdot [k | j&#39;] \right ) = \star
+$$&lt;/p&gt;
+&lt;p&gt;Оба выражения в скобках равны сумме чисел $\le \left\lfloor \frac{n}{d} \right\rfloor$, которые делятся на $k$. Это числа $k, 2k, \ldots, \left\lfloor \frac{\left\lfloor \frac{n}{d} \right\rfloor}{k} \right\rfloor \cdot k = \left\lfloor \frac{n}{dk} \right\rfloor \cdot k$.
+Их сумма равна&lt;/p&gt;
+&lt;p&gt;$$k \cdot \frac{\left ( \left\lfloor \frac{n}{dk} \right\rfloor \right ) \cdot \left ( \left\lfloor \frac{n}{dk} \right\rfloor + 1 \right )}{2}$$&lt;/p&gt;
+&lt;p&gt;Обозначим второй множитель за $g(\left\lfloor \frac{n}{dk} \right\rfloor)$&lt;/p&gt;
+&lt;p&gt;Подставим это в нашу формулу:&lt;/p&gt;
+&lt;p&gt;$$
+\star = \sum_{d = 1}^{n} d \sum_{k = 1}^{\left\lfloor \frac{n}{d} \right\rfloor} \mu(k) \cdot k^2 \cdot g^2\left(\left\lfloor \frac{n}{dk} \right\rfloor\right) = \textcolor{gray}{\text{/ обозначим $l = kd$ /}} =
+$$&lt;/p&gt;
+&lt;p&gt;$$
+= \sum_{l = 1}^{n} l \cdot g^2\left(\left\lfloor \frac{n}{l} \right\rfloor\right) \sum_{k | l} k \cdot \mu(k) = \textcolor{gray}{\text{/ $h(l) := l \cdot \sum_{k | l} k \cdot \mu(k) $ /}} = \sum_{l = 1}^{n} g^2\left(\left\lfloor \frac{n}{l} \right\rfloor\right) \cdot h(l)
+$$&lt;/p&gt;
+&lt;p&gt;При этом $h$ можно выразить как $id \cdot (1 * (id \cdot \mu))$, так что $h$ мультипликативна, потому что и свертка, и произведение мультипликативных функций являются мультипликативными. Кроме того, $g(n, l)$ вычисляется по формуле, поэтому ее мы можем считать за $O(1)$. Так что такую сумму можно считать за $O(n)$, так как мультипликативную функцию $h$ можно насчитать линейным решетом ($h(p^k) = p^k \cdot (1 - p)$ вычисляется за $O(1)$).&lt;/p&gt;
+&lt;p&gt;Однако мы хотим быстрее. В $g$ мы подставляем всего $\sqrt{n}$ различных значений, поэтому как раньше, нам надо научиться быстро считать $s_h$. Для этого нужно найти какую-то мультипликативную функцию $q$, чтобы $s_q$ и $s_{h * q}$ можно было считать за $O(1)$.&lt;/p&gt;
+&lt;p&gt;Давайте докажем, что $h * id^2 = id$. В этом нам поможет следующий факт:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Лемма:&lt;/strong&gt;
+Для любых арифметических функций $f, g$ верно:&lt;/p&gt;
+&lt;p&gt;$$(id \cdot f) * (id \cdot g) = id \cdot (f * g)$$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Доказательство:&lt;/strong&gt;
+Это доказывается простой подстановкой:&lt;/p&gt;
+&lt;p&gt;$$\left((id \cdot f) * (id \cdot g)\right)(n) = \sum_{d | n} d \cdot f(d) \cdot \frac{n}{d} \cdot g\left(\frac{n}{d}\right) = n \cdot \sum_{d | n}  f(d) \cdot g\left(\frac{n}{d}\right) = n \cdot (f * g)$$&lt;/p&gt;
+&lt;p&gt;Мы хотим доказать, что $h * id^2 = id$. Запишем цепочку равенств:&lt;/p&gt;
+&lt;p&gt;$$h * id^2 = (id \cdot (1 * (id \cdot mu))) * (id \cdot id) = \textcolor{gray}{\text{/ по лемме /}} = id \cdot ((1 * (id \cdot mu)) * id) = $$&lt;/p&gt;
+&lt;p&gt;$$ = \textcolor{gray}{\text{/ по ассоциативности свертки /}} = id \cdot (1 * ((id \cdot mu) * (id \cdot 1))) = \textcolor{gray}{\text{/ по лемме /}} = id \cdot (1 * (id \cdot (\mu * 1))) = $$&lt;/p&gt;
+&lt;p&gt;$$ = \textcolor{gray}{\text{/мы доказывали, что $\mu * 1 = \chi_1$/}} = id \cdot (1 * (id \cdot \chi_1)) = \textcolor{gray}{\text{/$\chi_1$ не равна нулю только в единице, а $id(1) = 1$/}} = $$&lt;/p&gt;
+&lt;p&gt;$$= id \cdot (1 * \chi_1) = \textcolor{gray}{\text{/ по одному из уже доказанных свойств /}} = id \cdot 1 = id$$&lt;/p&gt;
+&lt;p&gt;Что и требовалось доказать. При этом $s_{id}$ и $s_{id^2}$ можно легко вычислять за $O(1)$:&lt;/p&gt;
+&lt;p&gt;$$s_{id}(n) = \frac{n \cdot (n + 1)}{2}$$&lt;/p&gt;
+&lt;p&gt;$$s_{id^2}(n) = \frac{n \cdot (n + 1) \cdot (2 n + 1)}{6}$$&lt;/p&gt;
+&lt;p&gt;Так что мы научились искать сумму НОКов всех пар чисел, не больших $n$, за $O(n^{\frac{2}{3}})$.&lt;/p&gt;
+&lt;h2 id=&#34;задачи-для-практики&#34;&gt;Задачи для практики&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.codechef.com/NOV15/problems/SMPLSUM&#34;&gt;https://www.codechef.com/NOV15/problems/SMPLSUM&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;http://acm.hdu.edu.cn/showproblem.php?pid=1695&#34;&gt;http://acm.hdu.edu.cn/showproblem.php?pid=1695&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;http://poj.org/problem?id=3904&#34;&gt;http://poj.org/problem?id=3904&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;http://acm.hdu.edu.cn/showproblem.php?pid=5608&#34;&gt;http://acm.hdu.edu.cn/showproblem.php?pid=5608&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.spoj.com/problems/DIVCNT2/&#34;&gt;https://www.spoj.com/problems/DIVCNT2/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+      
+    </item>
+    
     <item>
       <title>Преобразование Уолша — Адамара и xor-and-or-свертки</title>
       <link>https://peltorator.ru/try_web/post/hadamard/</link>

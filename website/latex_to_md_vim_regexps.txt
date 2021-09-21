@@ -29,6 +29,7 @@
 %s/\\begin{problem}/**Задача:**/g
 %s/\\begin{example}/**Пример:**/g
 %s/\\begin{exercise}/**Упражнение:**/g
+%s/\\begin{properties}/**Свойства:**/g
 %s/\\begin{lemma}/**Лемма:**/g
 %s/\\begin{proof}/**Доказательство:**/g
 %s/\\begin{designation}/**Обозначение:**/g

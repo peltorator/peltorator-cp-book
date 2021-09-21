@@ -46,6 +46,7 @@
 
 <script src="https://tikzjax.com/v1/tikzjax.js"></script>
 <script src="https://tikzwolke.com/v1/tikzwolke.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 
 <link rel="canonical" href="https://peltorator.ru/try_web/">
@@ -85,6 +86,19 @@
 
     <main id="main" class="index">
       
+      
+      <div class="post">
+        <h2>
+          <a href="https://peltorator.ru/try_web/post/all_mod_inv/">Нахождение обратных ко всем остаткам за $O(p)$</a>
+          <time>2021-09-13</time>
+        </h2>
+        
+        <div class="content">
+          
+          Часто бывает так, что в задаче нужно делить по модулю много раз. Это можно делать обычным алгоритмом взятия обратного по модулю за $O(\log p)$ на запрос. Если мы сделаем $n$ запросов, то асимптотика будет $O(n \log p)$. Сейчас мы рассмотрим алгоритм, который изначально предпосчитает обратные ко всем остаткам за $O(p)$, и тогда на запросы мы будем отвечать за $O(1)$. Если $n$ порядка $p$ или больше, то этот вариант будет более эффективен.
+          
+        </div>
+      </div>
       
       <div class="post">
         <h2>
