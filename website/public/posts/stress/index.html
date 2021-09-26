@@ -223,15 +223,15 @@ fc smart_output stupid_output
     <span class="n">smart_ans</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s1">&#39;./smart &lt; input&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
     <span class="n">stupid_ans</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s1">&#39;./stupid &lt; input&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">smart_ans</span> <span class="o">!=</span> <span class="n">stupid_ans</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Outputs aren&#39;t equal&#34;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Input:&#34;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&#34;input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;stupid answer:&#34;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Outputs are not equal&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Input:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stupid answer:&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">stupid_ans</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;smart answer:&#34;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;smart answer:&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">smart_ans</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&#34;All tests passed&#34;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All tests passed&#39;</span><span class="p">)</span>
 </code></pre></div><p>Здесь <code>os.popen</code> выполняет консольную команду, а <code>readlines</code> сохраняет вывод программы.</p>
 <p>Плюсом этого подхода является платформонезависимость.</p>
 <h2 id="in-code-стрессы">In-Code стрессы</h2>
