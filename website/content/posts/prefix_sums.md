@@ -670,6 +670,7 @@ $$a_{i + 1, j + 1} = b_{i + 1, j + 1} - b_{i, j + 1} - b_{i + 1, j} + b_{i, j}$$
 ## Задачи для практики
 
 
-- Предлагается прорешать специально подготовленный [контест](https://codeforces.com/group/1rv4rhCsHp/contest/319055) на codeforces.
+- Предлагается прорешать специально подготовленный [контест](https://codeforces.com/group/1rv4rhCsHp/contest/319055) на codeforces. Если у вас нет доступа к соревнованию, нужно сначала вступить в [группу](https://codeforces.com/group/1rv4rhCsHp/contests).
+
 
 

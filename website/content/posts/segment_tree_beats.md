@@ -762,5 +762,6 @@ $$= S_i - ind \cdot A'_i = S_i - ind \cdot (A_i + x) = S_i - ind \cdot A_i - ind
 
 - Задача на сумму исторических максимумов доступна [здесь](https://uoj.ac/problem/169). Также есть похожая задача [здесь](https://www.luogu.com.cn/problem/P4314).
 
-- Кроме того можете прорешать специально подготовленный [контест](https://codeforces.com/group/1rv4rhCsHp/contest/327313) на codeforces.   
+- Кроме того можете прорешать специально подготовленный [контест](https://codeforces.com/group/1rv4rhCsHp/contest/327313) на codeforces.  Если у вас нет доступа к соревнованию, нужно сначала вступить в [группу](https://codeforces.com/group/1rv4rhCsHp/contests).
+ 
 
