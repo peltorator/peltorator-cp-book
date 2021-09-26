@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+<meta name="author" content="peltorator">
+
+
+
+<meta name="description" content="Часто в задачах бывает необходимо искать $n! \bmod p$. Обычно модуль — это большое число, а $n$ не очень большое, поэтому можно просто заранее предпосчитать все факториалы. Однако иногда бывает обратная ситуация: $p &lt; n$. С первого взгляда кажется, что это бессмысленная задача: в $n!$ в таком случае входит число $p$, поэтому $n! \bmod p = 0$. Но часто нас не устраивает такой ответ, потому что нам часто нужно делить факториалы друг на друга.">
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+
+<meta name="keywords" content=" hugo  latex  theme ">
+
+
+
+
+<script>
+  
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    }
+  };
+</script>
+
+<script async defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+
+
+<link rel="stylesheet" type="text/css" href="http://tikzjax.com/v1/fonts.css">
+<script src="https://tikzjax.com/v1/tikzjax.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+<link rel="canonical" href="https://peltorator.ru/posts/mod_factorial/">
+
+
+
+
+<title>Поиск факториала по простому модулю - peltorator</title>
+
+
+
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/common.css'>
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/content.css'>
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/highlight.css'>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Поиск факториала по простому модулю" />
+<meta name="twitter:description" content="Часто в задачах бывает необходимо искать $n! \bmod p$. Обычно модуль — это большое число, а $n$ не очень большое, поэтому можно просто заранее предпосчитать все факториалы. Однако иногда бывает обратная ситуация: $p &lt; n$. С первого взгляда кажется, что это бессмысленная задача: в $n!$ в таком случае входит число $p$, поэтому $n! \bmod p = 0$. Но часто нас не устраивает такой ответ, потому что нам часто нужно делить факториалы друг на друга." />
+
+
+  <link rel="stylesheet" href='https://peltorator.ru/css/single.css'>
+</head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1>
+    <a href="https://peltorator.ru/">peltorator</a>
+  </h1>
+
+  <nav>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/">Статьи</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/about/">Полезные ссылки</a>
+    </span>
+    
+  </nav>
+</header>
+
+    <main id="main" class="post">
+      
+      
+      <div class="content">
+        <p>Часто в задачах бывает необходимо искать $n! \bmod p$. Обычно модуль — это большое число, а $n$ не очень большое, поэтому можно просто заранее предпосчитать все факториалы. Однако иногда бывает обратная ситуация: $p &lt; n$. С первого взгляда кажется, что это бессмысленная задача: в $n!$ в таком случае входит число $p$, поэтому $n! \bmod p = 0$. Но часто нас не устраивает такой ответ, потому что нам часто нужно делить факториалы друг на друга. В этом случае мы можем получить выражения типа $\frac{0}{0}$, которое на самом деле равно чему-то ненулевому. Встает задача: посчитать $n! \bmod p$ без вхождений $p$ в $n!$ и отдельно посчитать степень вхождения $p$ в факториал, то есть представить $n!$ в виде $a \cdot p^k$, где $a$ не делится на $p$.</p>
+<p>Пускай $\left\lfloor \frac{n}{p} \right\rfloor = k$ и $n \bmod p = b$. Тогда</p>
+<p>$$n! = (1 \cdot 2 \cdot \ldots \cdot (p - 1)) \cdot p \cdot ((p + 1) \cdot (p + 2) \cdot \ldots \cdot (2p - 1)) \cdot (2p) \cdot \ldots \cdot (kp) \cdot ((kp + 1) \cdot \ldots \cdot (kp + b))$$</p>
+<p>Если брать это по модулю $p$, то получится</p>
+<p>$$(p - 1)! \cdot p \cdot (p - 1)! \cdot (2p) \cdot \ldots \cdot (p - 1)! \cdot (kp) \cdot b! = \left((p - 1)!\right)^k \cdot b! \cdot (k! \cdot p^k)$$</p>
+<p>При этом $p^k$ мы игнорируем, потому что это вхождения $p$.</p>
+<p>По теореме Вильсона $(p - 1)! \bmod p = -1$. Так что нам необходимо посчитать $(-1)^k \cdot b! \cdot k!$.
+При этом $b &lt; p$ (это остаток от деления на $p$), так что $b!$ можно посчитать за $O(p)$, после чего рекурсивно запуститься для подсчета $k!$. Каждый раз мы делим число $n$ на $p$, так что будет всего $\log_p n = \frac{\log n}{\log p}$ итераций. Асимптотика — $O(p \log_p n)$. С другой стороны, все факториалы до $p$ можно предпосчитать заранее, и тогда асимптотика будет $O(\log_p n)$ на запрос и $O(p)$ на предпосчет.</p>
+<p>Реализация представлена ниже:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">int</span> <span class="nf">modFactorial</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="n">n</span><span class="p">,</span> <span class="kt">int</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">factorial</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">long</span> <span class="kt">long</span> <span class="n">k</span> <span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="n">p</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">n</span> <span class="o">%</span> <span class="n">p</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">factorial</span> <span class="o">=</span> <span class="mi">1LL</span> <span class="o">*</span> <span class="n">factorial</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">factorial</span> <span class="o">=</span> <span class="mi">1LL</span> <span class="o">*</span> <span class="n">factorial</span> <span class="o">*</span> <span class="n">i</span> <span class="o">%</span> <span class="n">p</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">factorial</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>С другой стороны, если нам надо посчитать степень вхождения $p$ в факториал, это делается еще проще. Давайте для этого посчитаем количество чисел, которые делятся на $p$, на $p^2$, на $p^3$ и т.д. И тогда если число делится ровно на $p^k$, то мы учтем его как раз $k$ раз. А если заметить, что количество чисел, делящихся на $p^i$, — это $\left\lfloor \frac{n}{p^i} \right\rfloor$, то получается такой незатейливый алгоритм:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">int</span> <span class="nf">factorialPower</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">int</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">power</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">n</span> <span class="o">/=</span> <span class="n">p</span><span class="p">;</span>
+        <span class="n">power</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">power</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>Асимптотика равна $O(\log_p n)$.</p>
+
+      </div>
+      
+    </main>
+    <footer id="footer">
+  <div>
+    <span>© 2021</span> - <span>2021</span>
+  </div>
+
+  <div>
+    <span>Powered by </span>
+    <a class="link" href="https://gohugo.io/">Hugo</a>
+    <span> 🍦 Theme </span>
+    <a class="link" href="https://github.com/queensferryme/hugo-theme-texify">TeXify</a>
+  </div>
+
+  <div class="footnote">
+    <span></span>
+  </div>
+</footer>
+
+  </div>
+  
+
+
+
+
+
+</body>
+
+</html>

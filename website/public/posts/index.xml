@@ -1,27 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>peltorator</title>
-    <link>https://peltorator.ru/</link>
-    <description>Recent content on peltorator</description>
+    <title>Posts on peltorator</title>
+    <link>https://peltorator.ru/posts/</link>
+    <description>Recent content in Posts on peltorator</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ru</language>
-    <lastBuildDate>Tue, 21 Sep 2021 11:52:23 +0300</lastBuildDate><atom:link href="https://peltorator.ru/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>About</title>
-      <link>https://peltorator.ru/about/</link>
-      <pubDate>Sun, 26 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://peltorator.ru/about/</guid>
-      
-      <description>&lt;p&gt;Актуальную pdf-версию этого сайта всегда можно найти по &lt;a href=&#34;https://peltorator.ru/cp_book.pdf&#34;&gt;ссылке&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Если вы нашли опечатку или ошибку, сообщите, пожалуйста, мне в телеграме, если вам не лень: &lt;a href=&#34;https://t.me/peltorator&#34;&gt;t.me/peltorator&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Прочитать про проект можно в блоге на &lt;a href=&#34;https://codeforces.com/blog/entry/91258&#34;&gt;codeforces&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;С историей последних изменений можно ознакомиться по &lt;a href=&#34;https://peltorator.ru/cp_book_changes&#34;&gt;ссылке&lt;/a&gt;.&lt;/p&gt;
-</description>
-      
-    </item>
-    
+    <lastBuildDate>Tue, 21 Sep 2021 11:52:23 +0300</lastBuildDate><atom:link href="https://peltorator.ru/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Обращение Мёбиуса, свертка Дирихле</title>
       <link>https://peltorator.ru/posts/mobius_convolution/</link>

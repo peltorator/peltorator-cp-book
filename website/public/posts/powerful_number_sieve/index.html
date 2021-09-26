@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+<meta name="author" content="peltorator">
+
+
+
+<meta name="description" content="Автор статьи: Александр Голованов
+Задача: Дана мультипликативная функция $f(n)$, а также число $N$. Необходимо посчитать $s_f(N) = \sum_{k=1}^Nf(k)$.
+Мы умеем делать это за $O(n^{2/3})$, если нам известна мультипликативная функция $g$, для которой мы умеем считать $s_g$ и $s_{f*g}$ за $O(1)$ при помощи обращения Мёбиуса. Оказывается, зачастую это можно делать быстрее, если функции обладают некоторыми дополнительными свойствами.
+Пусть $g(n)$ и $h(n)$ — такие мультипликативные функции, что $f = h*g$. Тогда верна следующая лемма:">
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+
+<meta name="keywords" content=" hugo  latex  theme ">
+
+
+
+
+<script>
+  
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    }
+  };
+</script>
+
+<script async defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+
+
+<link rel="stylesheet" type="text/css" href="http://tikzjax.com/v1/fonts.css">
+<script src="https://tikzjax.com/v1/tikzjax.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+<link rel="canonical" href="https://peltorator.ru/posts/powerful_number_sieve/">
+
+
+
+
+<title>Сумма мультипликативной функции: Powerful Number Sieve - peltorator</title>
+
+
+
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/common.css'>
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/content.css'>
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/highlight.css'>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Сумма мультипликативной функции: Powerful Number Sieve" />
+<meta name="twitter:description" content="Автор статьи: Александр Голованов
+Задача: Дана мультипликативная функция $f(n)$, а также число $N$. Необходимо посчитать $s_f(N) = \sum_{k=1}^Nf(k)$.
+Мы умеем делать это за $O(n^{2/3})$, если нам известна мультипликативная функция $g$, для которой мы умеем считать $s_g$ и $s_{f*g}$ за $O(1)$ при помощи обращения Мёбиуса. Оказывается, зачастую это можно делать быстрее, если функции обладают некоторыми дополнительными свойствами.
+Пусть $g(n)$ и $h(n)$ — такие мультипликативные функции, что $f = h*g$. Тогда верна следующая лемма:" />
+
+
+  <link rel="stylesheet" href='https://peltorator.ru/css/single.css'>
+</head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1>
+    <a href="https://peltorator.ru/">peltorator</a>
+  </h1>
+
+  <nav>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/">Статьи</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/about/">Полезные ссылки</a>
+    </span>
+    
+  </nav>
+</header>
+
+    <main id="main" class="post">
+      
+      
+      <div class="content">
+        <p><strong>Автор статьи: Александр Голованов</strong></p>
+<p><strong>Задача:</strong>
+Дана мультипликативная функция $f(n)$, а также число $N$. Необходимо посчитать $s_f(N) = \sum_{k=1}^Nf(k)$.</p>
+<p>Мы умеем делать это за $O(n^{2/3})$, если нам известна мультипликативная функция $g$, для которой мы умеем считать $s_g$ и $s_{f*g}$ за $O(1)$ при помощи <a href="/try_web/post/mobius_convolution/">обращения Мёбиуса</a>. Оказывается, зачастую это можно делать быстрее, если функции обладают некоторыми дополнительными свойствами.</p>
+<p>Пусть $g(n)$ и $h(n)$ — такие мультипликативные функции, что $f = h*g$. Тогда верна следующая лемма:</p>
+<p><strong>Лемма:</strong>
+$$s_f(n) = \sum_{k=1}^nh(k)s_g\left(\left\lfloor\frac{n}{k}\right\rfloor\right)$$</p>
+<p><strong>Доказательство:</strong>
+В сумме слева есть все возможные слагаемые вида $h(k) \cdot g(l)$, где $k \cdot l \le n$. Таким образом, для фиксированного $k$ мы должны перемножить $h(k)$ со всеми такими $g(l)$, что $l \le \left\lfloor \frac{n}{k} \right\rfloor$, то есть с префиксной суммой $g$. Что и требовалось доказать.</p>
+<p>Пускай функция $h$ такова, что $h(p) = 0$ для любого простого $p$.
+Тогда заметим, что в правой части выражения из леммы те слагаемые, в которых $k$ содержит в себе некоторый простой множитель ровно в первой степени, зануляются (из свойства функции $h$). Остальные же числа содержат каждый свой простой множитель хотя бы во второй степени. Будем называть такие числа <em>сильными</em> (от английского <em>powerful</em>, которое происходит от слова <em>power</em> в значении &laquo;степень&raquo;).</p>
+<p><strong>Лемма:</strong>
+Всякое сильное число $n$ можно представить в виде $a^2b^3$ для некоторых натуральных $a$ и $b$.</p>
+<p><strong>Доказательство:</strong>
+Для этого нужно представить каждую степень простого $p_i^{\alpha_i}$, входящую в $n$, в таком виде, а потом перемножить их. То есть надо просто представить степень $\alpha_i$ в виде $2x + 3y$. Безусловно, это можно сделать, так как $\alpha_i \ge 2$ (для четного $n$ можно взять $x = \frac{n}{2}$ и $y = 0$, а для нечетного подойдет решение $x = \frac{n - 3}{2}$ и $y = 1$).</p>
+<p>Тогда для вычисления $s_f$ нам нужно научиться эффективно перебирать все сильные числа $k$ и суммировать $h(k) s_g\left(\left\lfloor \frac{n}{k} \right\rfloor\right)$. Будем делать это рекурсивно, перебирая простые числа по возрастанию и выбирая их в степени либо ноль, либо хотя бы два. Обратите внимание на то, что если простое число $p$ входит в разложение сильного числа $k$, то $p \le \sqrt{k} \le \sqrt{n}$, потому что каждый простой множитель входит в $k$ хотя бы во второй степени, поэтому перебирать простые мы можем только до $\sqrt{n}$.</p>
+<p>Рассмотрим следующий алгоритм вычисления функции $s_f$:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">T</span> <span class="nf">s_f</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="n">n</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">cur</span><span class="p">,</span> <span class="kt">int</span> <span class="n">idx</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">new_value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">T</span> <span class="n">ans</span> <span class="o">=</span> <span class="n">new_value</span> <span class="o">?</span> <span class="n">h</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span> <span class="o">*</span> <span class="n">s_g</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">cur</span><span class="p">)</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">cur</span> <span class="o">/</span> <span class="n">primes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">/</span> <span class="n">primes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// can&#39;t multiply anymore
+</span><span class="c1"></span>        <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">ans</span> <span class="o">+=</span> <span class="n">s_f</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">cur</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">cur</span> <span class="o">*</span> <span class="n">primes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">primes</span><span class="p">[</span><span class="n">idx</span><span class="p">];</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">cur</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ans</span> <span class="o">+=</span> <span class="n">s_f</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">cur</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+        <span class="n">cur</span> <span class="o">*=</span> <span class="n">primes</span><span class="p">[</span><span class="n">idx</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>Здесь <code>primes</code> — массив с простыми числами хотя бы до $\sqrt{N}$; <code>cur</code> — текущее значение $k$, которое мы перебираем рекурсивно; <code>idx</code> — индекс текущего простого из списка <code>primes</code>; <code>new_value</code> — флаг, который нужен, чтобы мы не прибавили одно и то же значение к ответу несколько раз, когда мы не берем текущее простое в разложение; а тип <code>T</code> может быть любым типом на Ваш выбор: например, <code>long long</code> или Ваш класс для модульной арифметики.</p>
+<p>Легко видеть, что этот алгоритм вычисляет $s_f$, перебирая лишь сильные числа. Оценим время его работы. Будем считать, что значение функции $s_g$ в точке $n$ мы можем вычислить за время $T_{s_g}(n)$, а вычисление $h(cur)$ работает за $O(1)$ (оно может считаться на лету по мультипликативности через значения в степенях простых). Тогда</p>
+<p>$$T_{s_f(n)} = \sum_{k\text{ is powerful}}T_{s_g}\left(\left\lfloor\frac{N}{k}\right\rfloor\right)\leq\sum_{a, b : a^2b^3\leq N}T_{s_g}\left(\frac{N}{a^2b^3}\right)\approx\int\limits_{1}^{\sqrt{N}}\int\limits_{1}^{\sqrt[3]{N/a^2}}T_{s_g}\left(\frac{N}{a^2b^3}\right)\ \mathrm{d}b\ \mathrm{d}a$$</p>
+<p>Для простоты предположим, что $T_{s_g}(n) = n^c$, где $c &gt; 1/3$. Тогда</p>
+<p>$$
+\int\limits_{1}^{\sqrt{N}}\int\limits_{1}^{\sqrt[3]{N/a^2}}T_{s_g}\left(\frac{N}{a^2b^3}\right)\ \mathrm{d}b\ \mathrm{d}a = \int\limits_{1}^{\sqrt{N}}\int\limits_{1}^{\sqrt[3]{N/a^2}}\frac{N^c}{a^{2c}b^{3c}}\ \mathrm{d}b\ \mathrm{d}a = N^c \int\limits_{1}^{\sqrt{N}} a^{-3c} \int\limits_{1}^{\sqrt[3]{N / a^2}} b^{-3c} \ \mathrm{d}b\ \mathrm{d}a =
+$$</p>
+<p>$$
+=  N^c \int\limits_{1}^{\sqrt{N}} a^{-2c} \cdot (3c - 1) \cdot (1 - const_1) \ \mathrm{d}a \le
+$$</p>
+<p>$$
+\le (3c - 1)N^c\int\limits_{1}^{\sqrt{N}} a^{-2c} \  \mathrm{d}a\leq
+\begin{cases}
+(1 - 2c)(3c - 1)N^c\cdot N^{1/2 - c} = O(\sqrt{N}), &amp; c &lt; \frac{1}{2}, \\<br>
+(3c - 1)N^c\ln\sqrt{N} = O(\sqrt{N}\log{n}), &amp; c = \frac{1}{2}, \\<br>
+(3c - 1)(2c - 1)N^c = O(T_{s_g}(N)), &amp; c &gt; \frac{1}{2}.
+\end{cases}
+$$</p>
+<p>Где $const_1$ — какое-то положительное число.</p>
+<p>Очевидно, если $c \le 1/3$, то время работы и подавно составляет $O(\sqrt{N})$.</p>
+<p><strong>Пример:</strong>
+Если $f(n)=\mathrm{rad}(n)$, то есть $f(p_1^{\alpha_1} \cdot \ldots \cdot p_k^{\alpha_k}) = p_1p_2 \cdot \ldots \cdot p_k$, то в качестве $h(n)$ можно взять мультипликативную функцию, для которой верно $h(1) = 1$, $h(p) = 0$ и $h(p^k) = p - p^2$ для всех $k &gt; 1$, а в качестве $g$ можно взять $g(n) = n$. Легко проверить, что $f = g * h$. Тогда сумма $f(n)$ на префиксе размера $N$ будет считаться за $O(\sqrt{N})$, потому что $T_{s_g}(n) = O(1)$.</p>
+<p><strong>Замечание:</strong>
+Как видно из примера, при поиске функций $h$ и $g$ имеет смысл подобрать их значения на степенях простых.</p>
+<p><strong>Замечание:</strong>
+При оценке времени работы мы пользовались представимостью сильных чисел в виде $a^2b^3$. Казалось бы, можно было бы написать два for-а по числам $a$ и $b$, и такой алгоритм был бы проще рекурсивного перебора сильных чисел. Однако сильные числа бывают представимы в таком виде больше, чем одним способом, поэтому при таком алгоритме придётся каким-то образом проверять числа на уникальность, что может повлиять на время работы.</p>
+
+      </div>
+      
+    </main>
+    <footer id="footer">
+  <div>
+    <span>© 2021</span> - <span>2021</span>
+  </div>
+
+  <div>
+    <span>Powered by </span>
+    <a class="link" href="https://gohugo.io/">Hugo</a>
+    <span> 🍦 Theme </span>
+    <a class="link" href="https://github.com/queensferryme/hugo-theme-texify">TeXify</a>
+  </div>
+
+  <div class="footnote">
+    <span></span>
+  </div>
+</footer>
+
+  </div>
+  
+
+
+
+
+
+</body>
+
+</html>

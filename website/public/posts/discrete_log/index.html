@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+<meta name="author" content="peltorator">
+
+
+
+<meta name="description" content="Даны числа $a$, $b$ и $m$. Необходимо найти такой $x$, что $a^x = b \mod m$. При этом $gcd(a, m) = 1$, но $m$ не обязано быть простым.
+Ответ есть не всегда, к примеру, при $a = 1$ и $b \neq 1$.
+Сделаем корневую декомпозицию. Известно, что $x \in [0, m - 1]$. Пусть $k = \left\lfloor \sqrt{m} \right\rfloor$. Посчитаем числа вида $a^{k n}$ для $0 \le n \le \left\lceil \sqrt{m} \right\rceil $ и положим их в unordered_map.">
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+
+<meta name="keywords" content=" hugo  latex  theme ">
+
+
+
+
+<script>
+  
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    }
+  };
+</script>
+
+<script async defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+
+
+<link rel="stylesheet" type="text/css" href="http://tikzjax.com/v1/fonts.css">
+<script src="https://tikzjax.com/v1/tikzjax.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+<link rel="canonical" href="https://peltorator.ru/posts/discrete_log/">
+
+
+
+
+<title>Дискретное логарифмирование - peltorator</title>
+
+
+
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/common.css'>
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/content.css'>
+<link media="screen" rel="stylesheet" href='https://peltorator.ru/css/highlight.css'>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Дискретное логарифмирование" />
+<meta name="twitter:description" content="Даны числа $a$, $b$ и $m$. Необходимо найти такой $x$, что $a^x = b \mod m$. При этом $gcd(a, m) = 1$, но $m$ не обязано быть простым.
+Ответ есть не всегда, к примеру, при $a = 1$ и $b \neq 1$.
+Сделаем корневую декомпозицию. Известно, что $x \in [0, m - 1]$. Пусть $k = \left\lfloor \sqrt{m} \right\rfloor$. Посчитаем числа вида $a^{k n}$ для $0 \le n \le \left\lceil \sqrt{m} \right\rceil $ и положим их в unordered_map." />
+
+
+  <link rel="stylesheet" href='https://peltorator.ru/css/single.css'>
+</head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1>
+    <a href="https://peltorator.ru/">peltorator</a>
+  </h1>
+
+  <nav>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/">Статьи</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/about/">Полезные ссылки</a>
+    </span>
+    
+  </nav>
+</header>
+
+    <main id="main" class="post">
+      
+      
+      <div class="content">
+        <p>Даны числа $a$, $b$ и $m$. Необходимо найти такой $x$, что $a^x = b \mod m$. При этом $gcd(a, m) = 1$, но $m$ не обязано быть простым.</p>
+<p>Ответ есть не всегда, к примеру, при $a = 1$ и $b \neq 1$.</p>
+<p>Сделаем корневую декомпозицию. Известно, что $x \in [0, m - 1]$. Пусть $k = \left\lfloor \sqrt{m} \right\rfloor$. Посчитаем числа вида $a^{k n}$ для $0 \le n \le \left\lceil \sqrt{m} \right\rceil $ и положим их в <code>unordered_map</code>. Пусть ответ — это $x$. $x = ki - j$, где $0 \le j &lt; k$.</p>
+<p>Тогда равенство можно записать как $a^{ki} = b \cdot a^j \mod p$. Числа слева у нас сохранены. Осталось последовательно домножать $b$ на $a$, пока такое число не попадется среди сохраненных.</p>
+<p>Получается асимптотика $O(\sqrt{m})$.</p>
+<p>Это хорошо, но на выполнение $n$ запросов уйдет $O(n \sqrt{m})$ времени.</p>
+<p>Давайте делать лучше. Пусть $m$ — это $2$, $4$, $p^k$ или $2 \cdot p^k$. Найдем заранее $g$ — первообразный корень по модулю $m$ (он как раз существует ровно для таких $m$) и число $\varphi(m)$. Это можно сделать за $\sqrt{m}$. Затем вместо нахождения логарифма $b$ с основанием $a$, мы будем искать логарифмы обоих чисел по основанию $g$, а потом их надо будет просто поделить друг на друга по модулю $\varphi(m)$.</p>
+<p>Заметим, что если мы всегда логарифмируем с фиксированным основанием, то первый шаг, на котором мы насчитываем все числа вида $g^{kn}$ можно не выполнять каждый раз, а только один раз в самом начале. Тогда можно взять $k \neq \sqrt{m}$.</p>
+<p>Первая фаза работает за $m / k$ и выполняется один раз. Тогда фаза подсчета работает за $O(k)$. Асимптотика — $O(m/k + nk)$. Возьмем $m/k = nk$ для оптимальной асимптотики. $k = \sqrt{m/n}$. Время работы $O(\sqrt{mn} + n \log m)$.</p>
+
+      </div>
+      
+    </main>
+    <footer id="footer">
+  <div>
+    <span>© 2021</span> - <span>2021</span>
+  </div>
+
+  <div>
+    <span>Powered by </span>
+    <a class="link" href="https://gohugo.io/">Hugo</a>
+    <span> 🍦 Theme </span>
+    <a class="link" href="https://github.com/queensferryme/hugo-theme-texify">TeXify</a>
+  </div>
+
+  <div class="footnote">
+    <span></span>
+  </div>
+</footer>
+
+  </div>
+  
+
+
+
+
+
+</body>
+
+</html>
