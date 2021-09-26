@@ -1,10 +1,10 @@
 \begin{code}
-const int N = (1 << 20); // N >= n
-long long tree[2 * N];
+vector<long long> tree;
 int n;
 
 void build(const vector<int>& arr) {
     n = arr.size();
+    tree.assign(2 * n, 0);
     for (int i = 0; i < n; i++) {
         tree[n + i] = arr[i];
     }
