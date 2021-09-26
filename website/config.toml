@@ -1,4 +1,4 @@
-baseURL = "https://peltorator.ru/try_web/"
+baseURL = "https://peltorator.ru/"
 defaultContentLanguage = "ru"
 hasCJKLanguage = true
 languageCode = "ru"
@@ -19,10 +19,21 @@ name = "peltorator"
     [markup.goldmark.renderer]
       unsafe = true
 
+[[menu.main]]
+  identifier = "post"
+  name = "Статьи"
+  url = "/"
+  weight = 1
+[[menu.main]]
+  identifier = "about"
+  name = "Полезные ссылки"
+  url = "/about/"
+  weight = 2
+
 [params]
   customCSS = []
   dateFormat = "2006-01-02"
-  description = "an example site for hugo theme TeXify"
+  description = "CP articles"
   enableFullRSS = true
   enableHanEmph = true
   enableMathjax = true
@@ -37,3 +48,4 @@ name = "peltorator"
   issue_term = "pathname"
   label = "Comment"
   theme = "github-light"
+
