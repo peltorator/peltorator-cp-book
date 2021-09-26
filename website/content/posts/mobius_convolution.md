@@ -462,9 +462,9 @@ $$\left((id \cdot f) * (id \cdot g)\right)(n) = \sum_{d | n} d \cdot f(d) \cdot 
 
 Мы хотим доказать, что $h * id^2 = id$. Запишем цепочку равенств:
 
-$$h * id^2 = (id \cdot (1 * (id \cdot mu))) * (id \cdot id) = \textcolor{gray}{\text{/ по лемме /}} = id \cdot ((1 * (id \cdot mu)) * id) = $$
+$$h * id^2 = (id \cdot (1 * (id \cdot \mu))) * (id \cdot id) = \textcolor{gray}{\text{/ по лемме /}} = id \cdot ((1 * (id \cdot \mu)) * id) = $$
 
-$$ = \textcolor{gray}{\text{/ по ассоциативности свертки /}} = id \cdot (1 * ((id \cdot mu) * (id \cdot 1))) = \textcolor{gray}{\text{/ по лемме /}} = id \cdot (1 * (id \cdot (\mu * 1))) = $$
+$$ = \textcolor{gray}{\text{/ по ассоциативности свертки /}} = id \cdot (1 * ((id \cdot \mu) * (id \cdot 1))) = \textcolor{gray}{\text{/ по лемме /}} = id \cdot (1 * (id \cdot (\mu * 1))) = $$
 
 $$ = \textcolor{gray}{\text{/мы доказывали, что $\mu * 1 = \chi_1$/}} = id \cdot (1 * (id \cdot \chi_1)) = \textcolor{gray}{\text{/$\chi_1$ не равна нулю только в единице, а $id(1) = 1$/}} = $$
 

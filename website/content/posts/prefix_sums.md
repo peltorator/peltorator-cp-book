@@ -7,6 +7,9 @@ draft: false
 
 <!--- TODO: возможно, нужно заменить математическую нотацию индексов на программистскую: b_i -> b[i]-->
 
+<!--- TODO: заменить желтый цвет на какой-то другой, потому что его не видно--->
+
+<!--- TODO: можно картинки сделать побольше--->
 
 ## Определения, основы и сила полуинтервалов
 
@@ -82,15 +85,15 @@ vector<int> findPrefixSums(const vector<int>& a) {
 
 <script type="text/tikz">
 \begin{tikzpicture}
-\foreach \n [count=\x] in {5, 4, 7, 2, 2, -1, 8}
+\foreach \n [count=\x] in {5, 4, 7, 2, 2, 1, 8}
   \node[rectangle, minimum size=9mm, draw] at (\x, 0) {$\n$};
 
-\foreach \s [count=\x] in {0, 5, 9, 16, 18, 20, 19, 27}
+\foreach \s [count=\x] in {0, 5, 9, 16, 18, 20, 21, 29}
   \node[below] at (\x-.5, -.5) {$\s$};
 \end{tikzpicture}
 </script>
 
-<span style="color:red">TODO: Почему-то вместо -1 показывается £1</span>
+<!---<span style="color:red">TODO: Почему-то вместо -1 показывается £1</span>--->
 
 ## Базовое применение
 
@@ -128,6 +131,15 @@ int getSum(int left, int right) { // [left, right)
 
 На самом деле, необходимо, чтобы функция, которую мы считаем на отрезке, была обратима, что равносильно тому, что должна быть возможность по двум префиксам восстановить значение на отрезке. К примеру, операция суммы обратима, потому что если мы прибавили лишнее, потом это можно вычесть. А операции минимума и максимума необратимы. Нельзя по значениям минимумов на префиксах получить значение минимума на отрезке. К примеру, если элемент на позиции $0$ в массиве самый маленький, то все префиксные минимумы будут равны этому элементу, но минимумы на каких-то отрезках совсем с ним не связаны.
 
+<!---
+<script type="text/tikz">
+\begin{tikzpicture}
+\foreach \n [count=\x] in {0, 4, 3, 2, 8, 2, 7}
+\ifthenelse{\x > 2 \AND \x < 7}{\node[rectangle, blue, draw]}{\node[rectangle, draw]} at (\x, 0) {$\n$};
+
+\end{tikzpicture}
+</script>
+
 <script type="text/tikz">
 \begin{tikzpicture}
 \foreach \n [count=\x] in {0, 4, 3, 2, 8, 2, 7}
@@ -143,6 +155,8 @@ int getSum(int left, int right) { // [left, right)
 </script>
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
+--->
+![test](/try_web/images/prefix_sums_min.svg)
 
 Но кроме суммы есть и другие операции, которые являются обратимыми. Одна из самых популярных — это, пожалуй, операция <<побитового исключающего или>> (Подробнее про эту операцию можно прочитать [здесь](https://learn.javascript.ru/bitwise-operators\#isklyuchayuschee-ili)), которая еще называется <<`xor`>> и обозначается $\oplus$.
 
@@ -208,7 +222,7 @@ $$
 
 Можно воспринимать происходящее, как будто мы построили префиксные суммы по одной координате, а затем посчитали префиксные суммы префиксных сумм по другой координате.
 
-
+<!---
 <span style="color:red">TODO: На белом фоне желтый цвет вообще не видно</span>
 
 <script type="text/tikz">
@@ -230,6 +244,8 @@ $$
 </script>
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
+--->
+![test](/try_web/images/prefix_sums_2d_1d.svg)
 
 Таким образом, можно насчитать префиксные суммы на одномерных массивах, а потом насчитать префиксные суммы на массивах префиксных сумм.
 
@@ -260,7 +276,7 @@ $$
 Эту формулу легко понять из картинки (зеленая область также принадлежит синей и желтой):
 
 $$\textcolor{purple}{?}=\textcolor{blue}{y}+\textcolor{yellow}{z}-\textcolor{green}{x}+\textcolor{red}{a[i][j]}$$
-
+<!---
 <script type="text/tikz">
 \begin{tikzpicture}
 \foreach \n in {0, 1, 2, 3, 4, 5, 6, 7}
@@ -276,6 +292,8 @@ $$\textcolor{purple}{?}=\textcolor{blue}{y}+\textcolor{yellow}{z}-\textcolor{gre
 </script>
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
+--->
+![test](/try_web/images/prefix_sums_2d_include_exclude.svg)
 
 Мы берем сумму двух меньших префиксных сумм, которые накрывают нашу, однако их пересечение учтется дважды, поэтому его надо вычесть. Но ведь это пересечение — это и есть $b_{i, j}$. И в конце стоит не забыть прибавить новый элемент — $a_{i, j}$.
 
@@ -303,7 +321,7 @@ $$
 Эту формулу также легче понимать, смотря на картинку:
 
 $$sum=\textcolor{purple}{b[rx][ry]}-\textcolor{blue}{b[lx][ry]}-\textcolor{yellow}{b[rx][ly]}+\textcolor{green}{b[lx][ly]}$$
-
+<!---
 <script type="text/tikz">
 \begin{tikzpicture}
 \foreach \n in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
@@ -319,10 +337,12 @@ $$sum=\textcolor{purple}{b[rx][ry]}-\textcolor{blue}{b[lx][ry]}-\textcolor{yello
 
 \draw[->] (-0.4, -0.3) -- (-0.4, -0.3 - 6 * 0.7) node [midway, left] (TextNode) {$x$};
 \draw[->] (-0.4 + 0.7, -0.5 - 7 * 0.7) -- (-0.4 + 0.7 * 14, -0.5 - 7 * 0.7) node [midway, below] (TextNode2) {$y$};
- \end{tikzpicture}
+\end{tikzpicture}
 </script>
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
+--->
+![test](/try_web/images/prefix_sums_2d_include_exclude_get.svg)
 
 Сначала мы взяли большой прямоугольник, который накрывает нужный нам, потом удалили ненужное слева и сверху, но то, что находится на их пересечении, мы удалили дважды, так что надо вернуть это пересечение назад.
 
@@ -446,11 +466,7 @@ vector<int> findDiffsArray(const vector<int>& arr) {
 Пускай на полуинтервале $[l, r)$ исходного массива (или на полуинтервале $[l + 1, r + 1)$ массива с фиктивным нулем в начале) прибавили ко всем элементам $d$.
 Заметим, что элементы массива $a$ на позициях меньших $l$ и больших $r$ никак не поменяются, потому что оба элемента в разности никак не поменялись. На позициях $l + 1, \ldots, r - 1$ тоже ничего не поменяется, потому что к обоим элементам разности прибавят $d$, в результате чего сама разность не изменится. К примеру, для позиции $l + 1$:
 
-![Картинка формулы ниже](/try_web/images/prefix_sums_pluseq.png)
-
-$$b^{new}_{l + 1} - b^{new}_l = \left(b^{old}_{l + 1} + d\right) - \left(b^{old}_l + d\right) = b^{old}_{l + 1} + d - b^{old}_l - d = b^{old}_{l + 1} - b^{old}_l$$
-
-<span style="color:red">TODO: Почему не компилируется LaTeX?</span>
+$$b^{new}\_{l + 1} - b^{new}\_l = \left(b^{old}\_{l + 1} + d\right) - \left(b^{old}\_l + d\right) = b^{old}\_{l + 1} + d - b^{old}\_l - d = b^{old}\_{l + 1} - b^{old}\_l$$
 
 Таким образом, после операции прибавления на отрезке изменятся только два элемента разностного массива: $a_{l}$ заменится на $a_{l} + d$, и $a_r$ заменится на $a_r - d$.
 
@@ -557,6 +573,7 @@ vector<int> postcalc(const vector<int>& a) {
 
 Можно заметить, что если в разностном массиве к какому-то элементу прибавить $d$, то в исходном массиве $d$ прибавится ко всем элементам на **суффиксном** подпрямоугольнике.
 
+<!---
 <script type="text/tikz">
 \begin{tikzpicture}
 \foreach \n in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -568,10 +585,12 @@ vector<int> postcalc(const vector<int>& a) {
 </script>
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
+--->
+![test](/try_web/images/prefix_sums_2d_suffix_add.svg)
 
 Теперь перед нами стоит задача <<прибавить на подпрямоугольнике через прибавления на суффиксных подпрямоугольниках>>. Эта задача аналогична задаче поиска суммы на подпрямоугольнике.
 
-
+<!---
 <script type="text/tikz">
 \begin{tikzpicture}
 \foreach \n in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -589,6 +608,9 @@ vector<int> postcalc(const vector<int>& a) {
 </script>
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
+--->
+
+![test](/try_web/images/prefix_sums_add_on_rectangle.svg)
 
 Прибавляем мы к тем же самым клеткам, сумму которых мы брали в задаче поиска суммы на подпрямоугольнике.
 
