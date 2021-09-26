@@ -18,6 +18,8 @@ name = "peltorator"
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
+  [markup.highlight]
+    lineNos = false
 
 [[menu.main]]
   identifier = "post"
@@ -48,4 +50,5 @@ name = "peltorator"
   issue_term = "pathname"
   label = "Comment"
   theme = "github-light"
+
 
