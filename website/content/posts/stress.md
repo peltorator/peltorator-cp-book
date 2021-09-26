@@ -177,15 +177,15 @@ for i in range(1, 100000):
     smart_ans = os.popen('./smart < input').readlines()
     stupid_ans = os.popen('./stupid < input').readlines()
     if smart_ans != stupid_ans:
-        print("Outputs aren't equal")
-        print("Input:")
-        print(*(open("input").readlines()))
-        print("stupid answer:")
+        print('Outputs are not equal')
+        print('Input:')
+        print(*(open('input').readlines()))
+        print('stupid answer:')
         print(*stupid_ans)
-        print("smart answer:")
+        print('smart answer:')
         print(*smart_ans)
         sys.exit()
-print("All tests passed")
+print('All tests passed')
 ```
 
 Здесь `os.popen` выполняет консольную команду, а `readlines` сохраняет вывод программы.
