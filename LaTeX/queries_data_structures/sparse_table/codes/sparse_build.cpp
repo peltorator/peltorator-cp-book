@@ -1,5 +1,5 @@
 \begin{code}
-vector<vector<int>> buildSparseTable(const vector<int>& arr) {
+vector<vector<int>> build_sparse_table(const vector<int>& arr) {
     int n = arr.size();
     int maxpow = ceil(log2(n + 1)); // 2^{maxpow} > n
     vector<vector<int>> sparse(maxpow, vector<int>(n, 0));

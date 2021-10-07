@@ -11,7 +11,7 @@
 Остается лишь придумать, как построить прыжки. Давайте сделаем это следующим образом: если прыжок из нашего отца (\verb+par+) имеет такую же длину, как и прыжок из прыжка нашего отца (\verb+jump[par]+), то мы проведем ребро в прыжок прыжка нашего отца (\verb+jump[jump[par]]+), а иначе проведем ребро просто в нашего отца. Если вы запутались, то рекомендую осознать код:
 
 \begin{code}
-void addLeaf(int v, int par) {
+void add_leaf(int v, int par) {
     parent[v] = par;
     depth[v] = depth[par] + 1;
     if (depth[par] - depth[jump[par]] == depth[jump[par]] - depth[jump[jump[par]]]) {

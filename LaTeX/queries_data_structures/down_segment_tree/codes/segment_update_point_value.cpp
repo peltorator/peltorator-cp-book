@@ -11,7 +11,7 @@ void build(const vector<int>& arr) {
     // tree[0..n-1] are zeros because there's nothing to add on a segment
 }
 
-long long findValue(int pos) {
+long long find_value(int pos) {
     pos += n;
     long long ans = 0;
     while (pos > 0) {
@@ -21,15 +21,15 @@ long long findValue(int pos) {
     return ans;
 }
 
-void segmentUpdate(int l, int r, int addVal) { // [l, r)
+void segment_update(int l, int r, int addval) { // [l, r)
     l += n;
     r += n;
     while (l < r) {
         if (l & 1) {
-            tree[l++] += addVal;
+            tree[l++] += addval;
         }
         if (r & 1) {
-            tree[--r] += addVal;
+            tree[--r] += addval;
         }
         l >>= 1;
         r >>= 1;

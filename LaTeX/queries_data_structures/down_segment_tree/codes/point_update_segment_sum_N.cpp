@@ -11,9 +11,9 @@ void build(const vector<int>& arr) {
     }
 }
 
-void updatePoint(int pos, int newVal) {
+void updatePoint(int pos, int newval) { // arr[pos] := newval
     pos += N;
-    tree[pos] = newVal;
+    tree[pos] = newval;
     pos >>= 1;
     while (pos > 0) {
         tree[pos] = tree[pos << 1] + tree[(pos << 1) | 1];
@@ -21,7 +21,7 @@ void updatePoint(int pos, int newVal) {
     }
 }
 
-long long findSum(int l, int r) { // [l, r)
+long long find_sum(int l, int r) { // [l, r)
     l += N;
     r += N;
     long long ans = 0;

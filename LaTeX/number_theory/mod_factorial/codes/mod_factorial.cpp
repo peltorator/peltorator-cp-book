@@ -1,5 +1,5 @@
 \begin{code}
-int modFactorial(long long n, int p) {
+int mod_factorial(long long n, int p) {
     int factorial = 1;
     while (n > 0) {
         long long k = n / p;

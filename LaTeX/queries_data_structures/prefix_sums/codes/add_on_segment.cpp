@@ -1,11 +1,11 @@
 \begin{code}
 vector<int> precalc(vector<int> b) {
     b.insert(b.begin(), 0); // add leading zero
-    vector<int> a = findDiffsArray(b);
+    vector<int> a = build_diffs_array(b);
     return a;
 }
 
-void addOnHalfInterval(int l, int r, int d) { // [l, r) += d
+void add_on_half_interval(int l, int r, int d) { // [l, r) += d
     a[l] += d;
     if (r < n) {
         a[r] -= d;
@@ -13,8 +13,8 @@ void addOnHalfInterval(int l, int r, int d) { // [l, r) += d
 }
 
 vector<int> postcalc(const vector<int>& a) {
-    vector<int> finalB = findPrefixSums(a);
-    finalB.erase(finalB.begin()); // delete leading zero
-    return finalB;
+    vector<int> finalb = build_prefix_sums(a);
+    finalb.erase(finalb.begin()); // delete leading zero
+    return finalb;
 }
 \end{code}

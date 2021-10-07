@@ -1,17 +1,17 @@
 \begin{code}
-vector<vector<int>> findPrefixSums2D(const vector<vector<int>>& a) {
+vector<vector<int>> build_prefix_sums_2d(const vector<vector<int>>& a) {
     int n = a.size();
     int m = a[0].size();
-    vector<vector<int>> prefixSum1D(n);
+    vector<vector<int>> prefix_sum_1d(n);
     for (int i = 0; i < n; i++) {
-        prefixSum1D[i] = findPrefixSums(a[i]);
+        prefix_sum_1d[i] = build_prefix_sums(a[i]);
     }
-    vector<vector<int>> prefixSum2D(n + 1, vector<int>(m + 1, 0));
+    vector<vector<int>> prefix_sum_2d(n + 1, vector<int>(m + 1, 0));
     for (int j = 0; j <= m; j++) {
         for (int i = 0; i < n; i++) {
-            prefixSum2D[i + 1][j] = prefixSum2D[i][j] + prefixSum1D[i][j];
+            prefix_sum_2d[i + 1][j] = prefix_sum_2d[i][j] + prefix_sum_1d[i][j];
         }
     }
-    return prefixSum2D;
+    return prefix_sum_2d;
 }
 \end{code}

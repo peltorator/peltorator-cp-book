@@ -1,5 +1,5 @@
 \begin{code}
-long long findSum(int lx, int rx, int ly, int ry) { // [lx, rx) * [ly, ry)
+long long find_sum(int lx, int rx, int ly, int ry) { // [lx, rx) * [ly, ry)
     lx += n;
     rx += n;
 

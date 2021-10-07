@@ -233,37 +233,37 @@ $.
 
 \begin{code}
     
-void andFold(vector<int> &a, int l, int r) {
+void and_convolution(vector<int> &a, int l, int r) {
     if (l + 1 == r) {
         return;
     }
     int mid = (r + l) / 2;
-    andFold(a, l, mid);
-    andFold(a, mid, r);
+    and_convolution(a, l, mid);
+    and_convolution(a, mid, r);
     for (int i = l; i < mid; i++) {
         a[i] += a[mid + (i - l)];
     }
 }
 
-void revAndFold(vector<int> &a, int l, int r) {
+void rev_and_convolution(vector<int> &a, int l, int r) {
     if (l + 1 == r) {
         return;
     }
     int mid = (r + l) / 2;
-    revAndFold(a, l, mid);
-    revAndFold(a, mid, r);
+    rev_and_convolution(a, l, mid);
+    rev_and_convolution(a, mid, r);
     for (int i = l; i < mid; i++) {
         a[i] -= a[mid + (i - l)];
     }
 }
 
 vector<int> andmult(vector<int> a, vector<int> b) {
-    andFold(a, 0, a.size());
-    andFold(b, 0, b.size());
+    and_convolution(a, 0, a.size());
+    and_convolution(b, 0, b.size());
     for (size_t i = 0; i < a.size(); i++) {
         a[i] *= b[i];
     }
-    revAndFold(a, 0, a.size());
+    rev_and_convolution(a, 0, a.size());
     return a;
 }
 
@@ -306,37 +306,37 @@ $.
 
 \begin{code}
     
-void orFold(vector<int> &a, int l, int r) {
+void or_convolution(vector<int> &a, int l, int r) {
     if (l + 1 == r) {
         return;
     }
     int mid = (r + l) / 2;
-    orFold(a, l, mid);
-    orFold(a, mid, r);
+    or_convolution(a, l, mid);
+    or_convolution(a, mid, r);
     for (int i = l; i < mid; i++) {
         a[mid + (i - l)] += a[i];
     }
 }
 
-void revOrFold(vector<int> &a, int l, int r) {
+void rev_or_convolution(vector<int> &a, int l, int r) {
     if (l + 1 == r) {
         return;
     }
     int mid = (r + l) / 2;
-    revOrFold(a, l, mid);
-    revOrFold(a, mid, r);
+    rev_or_convolution(a, l, mid);
+    rev_or_convolution(a, mid, r);
     for (int i = l; i < mid; i++) {
         a[mid + (i - l)] -= a[i];
     }
 }
 
 vector<int> ormult(vector<int> a, vector<int> b) {
-    orFold(a, 0, a.size());
-    orFold(b, 0, b.size());
+    or_convolution(a, 0, a.size());
+    or_convolution(b, 0, b.size());
     for (size_t i = 0; i < a.size(); i++) {
         a[i] *= b[i];
     }
-    revOrFold(a, 0, a.size());
+    rev_or_convolution(a, 0, a.size());
     return a;
 }
 
@@ -373,7 +373,7 @@ void hadamard(vector<int> &a) {
 \end{code}
 
 \begin{code}
-void andFold(vector<int>& a, bool inv) {
+void and_convolution(vector<int>& a, bool inv) {
     for (size_t len = 1; len < a.size(); len *= 2) {
         for (size_t i = 0; i < a.size(); i += 2 * len) {
             for (size_t j = 0; j < len; j++) {
@@ -389,7 +389,7 @@ void andFold(vector<int>& a, bool inv) {
 \end{code}
 
 \begin{code}
-void orFold(vector<int>& a, bool inv) {
+void or_convolution(vector<int>& a, bool inv) {
     for (size_t len = 1; len < a.size(); len *= 2) {
         for (size_t i = 0; i < a.size(); i += 2 * len) {
             for (int j = 0; j < len; j++) {
@@ -440,7 +440,7 @@ void orFold(vector<int>& a, bool inv) {
 Из такого объяснения вытекает немного другой способ написания той же or-свертки, который может показаться вам более простым:
 
 \begin{code}
-void orFold(vector<int>& a, bool inv) {
+void or_convolution(vector<int>& a, bool inv) {
     for (size_t len = 1; len < a.size(); len *= 2) {
         for (size_t i = 0; i < a.size(); i++) {
             if (i & len == 0) {

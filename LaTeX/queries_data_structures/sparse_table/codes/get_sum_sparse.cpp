@@ -1,5 +1,5 @@
 \begin{code}
-long long findSum(int l, int r) { // [l, r)
+long long find_sum(int l, int r) { // [l, r)
     long long ans = 0;
     for (int power = logs[r - l]; power >= 0; power--) {
         if (l + (1 << power) <= r) {

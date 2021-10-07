@@ -1,5 +1,5 @@
 \begin{code}
-vector<int> findDiffsArray(const vector<int>& arr) {
+vector<int> build_diffs_array(const vector<int>& arr) {
     int n = arr.size();
     vector<int> diffs(n - 1);
     for (int i = 0; i < n - 1; i++) {
