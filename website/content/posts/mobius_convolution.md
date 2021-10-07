@@ -281,8 +281,8 @@ $$s_f(n) = \frac{s_{f * g}(n) - \sum_{d = 2}^{n} s_f \left ( \left\lfloor \frac{
 
 ```cpp
 for (int left = 1, right; left <= n; left = right) {
-right = n / (int)(n / left) + 1;
-// in [left; right) values of n/d are equal
+    right = n / (int)(n / left) + 1;
+    // in [left; right) values of n/d are equal
 }
 ```
 

@@ -53,13 +53,13 @@ $b_{i + 1} = b_{i} + a_{i},$ где $i \ge 0$
 Из рекуррентной формулы сразу становится ясно, как посчитать массив префиксных сумм за $O(n)$:
 
 ```cpp
-vector<int> findPrefixSums(const vector<int>& a) {
+vector<int> build_prefix_sums(const vector<int>& a) {
     int n = a.size();
-    vector<int> prefixSums(n + 1, 0);
+    vector<int> prefix_sums(n + 1, 0);
     for (int i = 0; i < n; i++) {
-        prefixSums[i + 1] = prefixSums[i] + a[i];
+        prefix_sums[i + 1] = prefix_sums[i] + a[i];
     }
-    return prefixSums;
+    return prefix_sums;
 }
 ```
 
@@ -70,19 +70,22 @@ vector<int> findPrefixSums(const vector<int>& a) {
 Кроме того, есть встроенная в C++ функция `std::partial_sum`, которая как раз таки считает префиксные суммы. Пример ее работы:
 
 ```cpp
-vector<int> findPrefixSums(const vector<int>& a) {
+vector<int> build_prefix_sums(const vector<int>& a) {
     int n = a.size();
-    vector<int> prefixSums(n + 1, 0);
-    partial_sum(a.begin(), a.end(), prefixSums.begin() + 1);
-    return prefixSums;
+    vector<int> prefix_sums(n + 1, 0);
+    partial_sum(a.begin(), a.end(), prefix_sums.begin() + 1);
+    return prefix_sums;
 }
 ```
 
-Обратите внимание, что сама функция `partial_sum` не оставляет нуля в начале, поэтому нам приходится делать это самим, добавляя единицу к `prefixSums.begin()`.
+Обратите внимание, что сама функция `partial_sum` не оставляет нуля в начале, поэтому нам приходится делать это самим, добавляя единицу к `prefix_sums.begin()`.
 
 **Пояснение:**
 У нас уже есть две интуиции для понимания $b_i$: сумма первых $i$ элементов исходного массива и сумма элементов исходного массива на полуинтервале $[0, i)$. Давайте посмотрим на еще один вариант того, как об этом можно думать. Можно представить, что элементы массива находятся в ячейках, а префиксные суммы находятся между ними — на перегородках. И содержат в себе суммы всего того, что находится перед этой перегородкой.
 
+![test](/images/prefix_sums_1d.svg)
+
+<!---
 <script type="text/tikz">
 \begin{tikzpicture}
 \foreach \n [count=\x] in {5, 4, 7, 2, 2, 1, 8}
@@ -92,7 +95,7 @@ vector<int> findPrefixSums(const vector<int>& a) {
   \node[below] at (\x-.5, -.5) {$\s$};
 \end{tikzpicture}
 </script>
-
+--->
 <!---<span style="color:red">TODO: Почему-то вместо -1 показывается £1</span>--->
 
 ## Базовое применение
@@ -116,7 +119,7 @@ $$
 
 
 ```cpp
-int getSum(int left, int right) { // [left, right)
+int get_sum(int left, int right) { // [left, right)
     return b[right] - b[left];
 }
 ```
@@ -250,20 +253,20 @@ $$
 Таким образом, можно насчитать префиксные суммы на одномерных массивах, а потом насчитать префиксные суммы на массивах префиксных сумм.
 
 ```cpp
-vector<vector<int>> findPrefixSums2D(const vector<vector<int>>& a) {
+vector<vector<int>> build_prefix_sums_2d(const vector<vector<int>>& a) {
     int n = a.size();
     int m = a[0].size();
-    vector<vector<int>> prefixSum1D(n);
+    vector<vector<int>> prefix_sum_1d(n);
     for (int i = 0; i < n; i++) {
-        prefixSum1D[i] = findPrefixSums(a[i]);
+        prefix_sum_1d[i] = build_prefix_sums(a[i]);
     }
-    vector<vector<int>> prefixSum2D(n + 1, vector<int>(m + 1, 0));
+    vector<vector<int>> prefix_sum_2d(n + 1, vector<int>(m + 1, 0));
     for (int j = 0; j <= m; j++) {
         for (int i = 0; i < n; i++) {
-            prefixSum2D[i + 1][j] = prefixSum2D[i][j] + prefixSum1D[i][j];
+            prefix_sum_2d[i + 1][j] = prefix_sum_2d[i][j] + prefix_sum_1d[i][j];
         }
     }
-    return prefixSum2D;
+    return prefix_sum_2d;
 }
 ```
 
@@ -300,16 +303,16 @@ $$\textcolor{purple}{?}=\textcolor{blue}{y}+\textcolor{yellow}{z}-\textcolor{gre
 Элементы, через которые мы считаем $b_{i + 1, j + 1}$ имеют меньшие индексы, поэтому подсчет двумерных префиксных сумм можно вести просто двумя вложенными циклами по возрастанию.
 
 ```cpp
-vector<vector<int>> findPrefixSums2D(const vector<vector<int>>& a) {
+vector<vector<int>> build_prefix_sums_2d(const vector<vector<int>>& a) {
     int n = a.size();
     int m = a[0].size();
-    vector<vector<int>> prefixSum(n + 1, vector<int>(m + 1, 0));
+    vector<vector<int>> prefix_sum(n + 1, vector<int>(m + 1, 0));
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            prefixSum[i + 1][j + 1] = prefixSum[i][j + 1] + prefixSum[i + 1][j] - prefixSum[i][j] + a[i][j];
+            prefix_sum[i + 1][j + 1] = prefix_sum[i][j + 1] + prefix_sum[i + 1][j] - prefix_sum[i][j] + a[i][j];
         }
     }
-    return prefixSum;
+    return prefix_sum;
 }
 ```
 
@@ -434,7 +437,7 @@ $a_{n - 2} = b_{n - 1} - b_{n - 2}$
 Также обратите внимание, что если для подсчета массива префиксных сумм была нужна рекуррентная формула, то каждый член разностного массива зависит всего от двух элементов исходного, так что можно пользоваться формулами из определения для подсчета разностного массива за $O(n)$.
 
 ```cpp
-vector<int> findDiffsArray(const vector<int>& arr) {
+vector<int> build_diffs_array(const vector<int>& arr) {
     int n = arr.size();
     vector<int> diffs(n - 1);
     for (int i = 0; i < n - 1; i++) {
@@ -477,11 +480,11 @@ $$b^{new}\_{l + 1} - b^{new}\_l = \left(b^{old}\_{l + 1} + d\right) - \left(b^{o
 ```cpp
 vector<int> precalc(vector<int> b) {
     b.insert(b.begin(), 0); // add leading zero
-    vector<int> a = findDiffsArray(b);
+    vector<int> a = build_diffs_array(b);
     return a;
 }
 
-void addOnHalfInterval(int l, int r, int d) { // [l, r) += d
+void add_on_half_interval(int l, int r, int d) { // [l, r) += d
     a[l] += d;
     if (r < n) {
         a[r] -= d;
@@ -489,9 +492,9 @@ void addOnHalfInterval(int l, int r, int d) { // [l, r) += d
 }
 
 vector<int> postcalc(const vector<int>& a) {
-    vector<int> finalB = findPrefixSums(a);
-    finalB.erase(finalB.begin()); // delete leading zero
-    return finalB;
+    vector<int> finalb = build_prefix_sums(a);
+    finalb.erase(finalb.begin()); // delete leading zero
+    return finalb;
 }
 ```
 
@@ -519,12 +522,12 @@ vector<int> postcalc(const vector<int>& a) {
 vector<int> precalc(vector<int> b) {
     b.insert(b.begin(), 0);
     b.insert(b.begin(), 0); // add two leading zeros
-    vector<int> a = findDiffsArray(findDiffsArray(b));
+    vector<int> a = build_diffs_array(build_diffs_array(b));
     return a;
 }
 
 // [l, r) += [step, 2 * step, ..., (r - l) * step]
-void addArithmOnHalfInterval(int l, int r, int step) {
+void add_arithm_on_half_interval(int l, int r, int step) {
     a[l] += step;
     if (r < n) {
         a[r] -= (r - l + 1) * step;
@@ -535,10 +538,10 @@ void addArithmOnHalfInterval(int l, int r, int step) {
 }
 
 vector<int> postcalc(const vector<int>& a) {
-    vector<int> finalB = findPrefixSums(findPrefixSums(a));
-    finalB.erase(finalB.begin());
-    finalB.erase(finalB.begin()); // delete leading zeros
-    return finalB;
+    vector<int> finalb = build_prefix_sums(build_prefix_sums(a));
+    finalb.erase(finalb.begin());
+    finalb.erase(finalb.begin()); // delete leading zeros
+    return finalb;
 }
 ```
 
@@ -621,7 +624,7 @@ vector<int> postcalc(const vector<int>& a) {
 
 ```cpp
 // [lx, rx) * [ly, ry) += d
-void addOnHalfRectangle (int lx, int ly, int rx, int ry, int d) {
+void add_on_half_rectangle(int lx, int ly, int rx, int ry, int d) {
     diffs[lx][ly] += d;
     if (ry < m) {
         diffs[lx][ry] -= d;
@@ -635,14 +638,14 @@ void addOnHalfRectangle (int lx, int ly, int rx, int ry, int d) {
 }
 
 vector<vector<int>> postcalc(const vector<vector<int>>& diffs) {
-    vector<vector<int>> finalArr = findPrefixSums2D(diffs);
-    finalArr.erase(finalArr.begin());
+    vector<vector<int>> final_arr = build_prefix_sums_2d(diffs);
+    final_arr.erase(final_arr.begin());
     // delete leading horizontal zeros
-    for (size_t i = 0; i < finalArr.size(); i++) {
-        finalArr[i].erase(finalArr[i].begin());
+    for (size_t i = 0; i < final_arr.size(); i++) {
+        final_arr[i].erase(final_arr[i].begin());
         // delete leading vertical zeros
     }
-    return finalArr;
+    return final_arr;
 }
 ```
 

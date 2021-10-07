@@ -54,17 +54,17 @@ $$
 Представим код алгоритма:
 
 ```cpp
-vector<int> getAllModularInverses(int p) {
-    vector<int> inverseFactorials(p);
-    inverseFactorials[p - 1] = p - 1; // -1 mod p = p - 1
+vector<int> get_all_modular_inverses(int p) {
+    vector<int> inverse_factorials(p);
+    inverse_factorials[p - 1] = p - 1; // -1 mod p = p - 1
     for (int k = p - 2; k > 0; k--) {
-        inverseFactorials[k] = 1LL * inverseFactorials[k + 1] * (k + 1) % p;
+        inverse_factorials[k] = 1LL * inverse_factorials[k + 1] * (k + 1) % p;
     }
 
     vector<int> inverses(p);
     int factorial = 1;
     for (int k = 1; k < p; k++) {
-        inverses[k] = 1LL * factorial * inverseFactorials[k] % p;
+        inverses[k] = 1LL * factorial * inverse_factorials[k] % p;
         factorial = 1LL * factorial * k % p;
     }
     return inverses;
@@ -120,7 +120,7 @@ $$
 Реализация у этого алгоритма крайне проста:
 
 ```cpp
-vector<int> getAllModularInverses(int p) {
+vector<int> get_all_modular_inverses(int p) {
     vector<int> inverses(p);
     inverses[1] = 1;
     for (int k = 2; k < p; k++) {

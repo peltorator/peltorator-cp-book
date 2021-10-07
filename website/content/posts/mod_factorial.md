@@ -22,7 +22,7 @@ $$(p - 1)! \cdot p \cdot (p - 1)! \cdot (2p) \cdot \ldots \cdot (p - 1)! \cdot (
 Реализация представлена ниже:
 
 ```cpp
-int modFactorial(long long n, int p) {
+int mod_factorial(long long n, int p) {
     int factorial = 1;
     while (n > 0) {
         long long k = n / p;
@@ -42,7 +42,7 @@ int modFactorial(long long n, int p) {
 С другой стороны, если нам надо посчитать степень вхождения $p$ в факториал, это делается еще проще. Давайте для этого посчитаем количество чисел, которые делятся на $p$, на $p^2$, на $p^3$ и т.д. И тогда если число делится ровно на $p^k$, то мы учтем его как раз $k$ раз. А если заметить, что количество чисел, делящихся на $p^i$, — это $\left\lfloor \frac{n}{p^i} \right\rfloor$, то получается такой незатейливый алгоритм:
 
 ```cpp
-int factorialPower(int n, int p) {
+int factorial_power(int n, int p) {
     int power = 0;
     while (n > 0) {
         n /= p;

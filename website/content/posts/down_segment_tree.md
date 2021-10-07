@@ -37,9 +37,9 @@ void build(const vector<int>& arr) {
     }
 }
 
-void updatePoint(int pos, int newVal) {
+void updatePoint(int pos, int newval) { // arr[pos] := newval
     pos += N;
-    tree[pos] = newVal;
+    tree[pos] = newval;
     pos >>= 1;
     while (pos > 0) {
         tree[pos] = tree[pos << 1] + tree[(pos << 1) | 1];
@@ -47,7 +47,7 @@ void updatePoint(int pos, int newVal) {
     }
 }
 
-long long findSum(int l, int r) { // [l, r)
+long long find_sum(int l, int r) { // [l, r)
     l += N;
     r += N;
     long long ans = 0;
@@ -65,7 +65,7 @@ long long findSum(int l, int r) { // [l, r)
 }
 ```
 
-Мы заменили все операции на битовые для ускорения. Отец вершины `v` — это `v >> 1`, а сыновья — `v << 1` и `(v << 1) | 1`. Вершина является правым сыном, если ее номер нечетный, а левым, если четный (обратите внимание, что и для левой, и для правой границы условия в `findSum` одинаковые, потому что правая граница берется не включительно).
+Мы заменили все операции на битовые для ускорения. Отец вершины `v` — это `v >> 1`, а сыновья — `v << 1` и `(v << 1) | 1`. Вершина является правым сыном, если ее номер нечетный, а левым, если четный (обратите внимание, что и для левой, и для правой границы условия в `find_sum` одинаковые, потому что правая граница берется не включительно).
 
 Однако самое удивительное — это то, что на самом деле везде в этом коде вместо `N` можно написать `n`:
 
@@ -84,9 +84,9 @@ void build(const vector<int>& arr) {
     }
 }
 
-void updatePoint(int pos, int newVal) {
+void update_point(int pos, int newval) { // arr[pos] := newval
     pos += n;
-    tree[pos] = newVal;
+    tree[pos] = newval;
     pos >>= 1;
     while (pos > 0) {
         tree[pos] = tree[pos << 1] + tree[(pos << 1) | 1];
@@ -94,7 +94,7 @@ void updatePoint(int pos, int newVal) {
     }
 }
 
-long long findSum(int l, int r) { // [l, r)
+long long find_sum(int l, int r) { // [l, r)
     l += n;
     r += n;
     long long ans = 0;
@@ -141,7 +141,7 @@ void build(const vector<int>& arr) {
     // tree[0..n-1] are zeros because there's nothing to add on a segment
 }
 
-long long findValue(int pos) {
+long long find_value(int pos) {
     pos += n;
     long long ans = 0;
     while (pos > 0) {
@@ -151,15 +151,15 @@ long long findValue(int pos) {
     return ans;
 }
 
-void segmentUpdate(int l, int r, int addVal) { // [l, r)
+void segment_update(int l, int r, int addval) { // [l, r)
     l += n;
     r += n;
     while (l < r) {
         if (l & 1) {
-            tree[l++] += addVal;
+            tree[l++] += addval;
         }
         if (r & 1) {
-            tree[--r] += addVal;
+            tree[--r] += addval;
         }
         l >>= 1;
         r >>= 1;
@@ -174,7 +174,7 @@ void segmentUpdate(int l, int r, int addVal) { // [l, r)
 Когда дерево отрезков двумерное, оно становится совсем медленным, и нам нужно делать сложную схему из рекурсивного запуска запроса к одномерному дереву отрезков из двумерного. В случае нерекурсивной реализации дерева отрезков снизу все практически так же просто, как с деревом Фенвика. Необходимо лишь написать два вложенных цикла вместо одного:
 
 ```cpp
-long long findSum(int lx, int rx, int ly, int ry) { // [lx, rx) * [ly, ry)
+long long find_sum(int lx, int rx, int ly, int ry) { // [lx, rx) * [ly, ry)
     lx += n;
     rx += n;
 
@@ -247,14 +247,14 @@ void build(const vector<int>& arr) {
     }
 }
 
-void updateVertex(int v, long long val) {
+void update_vertex(int v, long long val) {
     tree[v] += val;
     if (v < n) {
         push[v] += val;
     }
 }
 
-void updateAncestors(int v) {
+void update_ancestors(int v) {
     v >>= 1;
     while (v > 0) {
         tree[v] = max(tree[v << 1], tree[(v << 1) | 1]) + push[v];
@@ -262,38 +262,38 @@ void updateAncestors(int v) {
     }
 }
 
-void doPush(int leaf) {
+void do_push(int leaf) {
     for (int k = logn; k > 0; k--) {
-        int curV = (leaf >> k);
-        updateVertex(curV << 1, push[curV]);
-        updateVertex((curV << 1) | 1, push[curV]);
-        push[curV] = 0;
+        int v = (leaf >> k);
+        update_vertex(v << 1, push[v]);
+        update_vertex((v << 1) | 1, push[v]);
+        push[v] = 0;
     }
 }
 
-void updateSegment(int l, int r, int val) { // [l, r) += val
+void update_segment(int l, int r, int val) { // [l, r) += val
     l += n;
     r += n;
     int ql = l, qr = r;
     while (l < r) {
         if (l & 1) {
-            updateVertex(l++, val);
+            update_vertex(l++, val);
         }
         if (r & 1) {
-            updateVertex(--r, val);
+            update_vertex(--r, val);
         }
         l >>= 1;
         r >>= 1;
     }
-    updateAncestors(ql);
-    updateAncestors(qr - 1);
+    update_ancestors(ql);
+    update_ancestors(qr - 1);
 }
 
-long long findMax(int l, int r) { // [l, r)
+long long find_max(int l, int r) { // [l, r)
     l += n;
     r += n;
-    doPush(l);
-    doPush(r - 1);
+    do_push(l);
+    do_push(r - 1);
     long long ans = -INF;
     while (l < r) {
         if (l & 1) {

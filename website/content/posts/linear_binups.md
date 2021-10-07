@@ -15,7 +15,7 @@ draft: false
 Остается лишь придумать, как построить прыжки. Давайте сделаем это следующим образом: если прыжок из нашего отца (`par`) имеет такую же длину, как и прыжок из прыжка нашего отца (`jump[par]`), то мы проведем ребро в прыжок прыжка нашего отца (`jump[jump[par]]`), а иначе проведем ребро просто в нашего отца. Если вы запутались, то рекомендую осознать код:
 
 ```cpp
-void addLeaf(int v, int par) {
+void add_leaf(int v, int par) {
     parent[v] = par;
     depth[v] = depth[par] + 1;
     if (depth[par] - depth[jump[par]] == depth[jump[par]] - depth[jump[jump[par]]]) {
