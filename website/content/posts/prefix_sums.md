@@ -156,7 +156,7 @@ int getSum(int left, int right) { // [left, right)
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
 --->
-![test](/try_web/images/prefix_sums_min.svg)
+![test](/images/prefix_sums_min.svg)
 
 Но кроме суммы есть и другие операции, которые являются обратимыми. Одна из самых популярных — это, пожалуй, операция <<побитового исключающего или>> (Подробнее про эту операцию можно прочитать [здесь](https://learn.javascript.ru/bitwise-operators\#isklyuchayuschee-ili)), которая еще называется <<`xor`>> и обозначается $\oplus$.
 
@@ -245,7 +245,7 @@ $$
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
 --->
-![test](/try_web/images/prefix_sums_2d_1d.svg)
+![test](/images/prefix_sums_2d_1d.svg)
 
 Таким образом, можно насчитать префиксные суммы на одномерных массивах, а потом насчитать префиксные суммы на массивах префиксных сумм.
 
@@ -293,7 +293,7 @@ $$\textcolor{purple}{?}=\textcolor{blue}{y}+\textcolor{yellow}{z}-\textcolor{gre
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
 --->
-![test](/try_web/images/prefix_sums_2d_include_exclude.svg)
+![test](/images/prefix_sums_2d_include_exclude.svg)
 
 Мы берем сумму двух меньших префиксных сумм, которые накрывают нашу, однако их пересечение учтется дважды, поэтому его надо вычесть. Но ведь это пересечение — это и есть $b_{i, j}$. И в конце стоит не забыть прибавить новый элемент — $a_{i, j}$.
 
@@ -342,7 +342,7 @@ $$sum=\textcolor{purple}{b[rx][ry]}-\textcolor{blue}{b[lx][ry]}-\textcolor{yello
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
 --->
-![test](/try_web/images/prefix_sums_2d_include_exclude_get.svg)
+![test](/images/prefix_sums_2d_include_exclude_get.svg)
 
 Сначала мы взяли большой прямоугольник, который накрывает нужный нам, потом удалили ненужное слева и сверху, но то, что находится на их пересечении, мы удалили дважды, так что надо вернуть это пересечение назад.
 
@@ -586,7 +586,7 @@ vector<int> postcalc(const vector<int>& a) {
 
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
 --->
-![test](/try_web/images/prefix_sums_2d_suffix_add.svg)
+![test](/images/prefix_sums_2d_suffix_add.svg)
 
 Теперь перед нами стоит задача <<прибавить на подпрямоугольнике через прибавления на суффиксных подпрямоугольниках>>. Эта задача аналогична задаче поиска суммы на подпрямоугольнике.
 
@@ -610,7 +610,7 @@ vector<int> postcalc(const vector<int>& a) {
 <span style="color:red">TODO: Почему-то не отображается картинка tikz</span>
 --->
 
-![test](/try_web/images/prefix_sums_add_on_rectangle.svg)
+![test](/images/prefix_sums_add_on_rectangle.svg)
 
 Прибавляем мы к тем же самым клеткам, сумму которых мы брали в задаче поиска суммы на подпрямоугольнике.
 
