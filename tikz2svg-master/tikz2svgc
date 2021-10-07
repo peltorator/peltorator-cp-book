@@ -1,0 +1,157 @@
+#!/usr/bin/env perl
+################################################################################
+# tikz2svgc:	TikZ to SVG converter client
+# Requires:	tikz2svg.cgi server, IO::Socket::SSL, Digest::HMAC_SHA1
+# Author:	Huidae Cho
+# Since:	January 12, 2019
+#
+# Copyright (C) 2019, Huidae Cho <https://idea.isnew.info>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+################################################################################
+use strict;
+# If you use the cPanel control panel, you may need this line
+#use cPanelUserConfig; $ENV{HOME} = "/home/username"; # Change this to yours
+eval "use IO::Socket::SSL;1" or die "IO::Socket::SSL missing" ;
+eval "use Digest::HMAC_SHA1 qw(hmac_sha1);1" or die "Digest::HMAC_SHA1 missing" ;
+
+my %cfg = do "$ENV{HOME}/.tikz2svgrc";
+
+# http://www.perlmonks.org/?node_id=631963
+# Thanks to Jochen Hoenicke <hoenicke@gmail.com>
+# (one of the authors of Palm Keyring)
+sub pbkdf2{
+	my ($prf, $password, $salt, $iter, $keylen) = @_;
+	my ($k, $t, $u, $ui, $i);
+	$t = "";
+	for($k = 1; length($t) < $keylen; $k++){
+		$u = $ui = $prf->($salt.pack('N', $k), $password);
+		for($i = 1; $i < $iter; $i++){
+			$ui = $prf->($ui, $password);
+			$u ^= $ui;
+		}
+		$t .= $u;
+	}
+	return substr $t, 0, $keylen;
+}
+
+# PBKDF2 for password hashing
+# http://www.ict.griffith.edu.au/anthony/software/pbkdf2.pl
+# Anthony Thyssen
+sub get_pbkdf2_key{
+	# key length: 128
+	my ($password, $salt) = @_;
+	my $prf = \&hmac_sha1;
+	my $iter = 8192;
+	my $keylen = 64;
+	return unpack("H*", pbkdf2($prf, $password, $salt, $iter, $keylen));
+}
+
+sub hash_password{
+	# hashed password length: 2*8+128=144
+	my ($pw, $salt) = @_;
+	my $salt = generate_salt() unless defined $salt;
+	return unpack("H*", $salt).get_pbkdf2_key($pw, $salt);
+}
+
+sub encode_url_most{
+	# Percent-encode characters that are not unreserved
+	my $url = shift;
+
+	# https://en.wikipedia.org/wiki/Percent-encoding
+	$url =~ s/([^a-zA-Z0-9_.~-])/@{[sprintf "%%%02X", ord($1)]}/g;
+	return $url;
+}
+
+my $tex = $#ARGV == 0 ? $ARGV[0] : "-";
+my $svg = $#ARGV == 1 ? $ARGV[1] : "-";
+
+my $src;
+{
+	local $/ = undef;
+	if($tex eq "-"){
+		*TEX = *STDIN;
+	}elsif(-f $tex){
+		open TEX, $tex;
+	}else{
+		die "$tex: File not found";
+	}
+	$src = encode_url_most(<TEX>);
+	close TEX unless $tex eq "-";
+}
+
+my $salt = int(time/300);
+my $key = hash_password($cfg{secret}, $salt);
+(my $jobname = $svg) =~ s#^.*/##;
+$jobname = "stdout" if $jobname eq "-";
+$jobname = encode_url_most($jobname);
+
+my $content = "key=$key&tex=$src&jobname=$jobname";
+my $content_length = length($content);
+
+my $eol = "\015\012";
+$cfg{server} =~ m#^([a-z]+)://([^/]+)(/.+)$#;
+my $port = $1;
+my $host = $2;
+my $script = $3;
+my $client = new IO::Socket::SSL->new(
+	PeerHost => $host,
+	PeerPort => $port,
+) || die "Cannot create a connection";
+print $client "POST $script HTTP/1.1$eol";
+print $client "Host: $host$eol";
+print $client "Content-Type: application/x-www-form-urlencoded$eol";
+print $client "Content-Length: $content_length$eol";
+print $client $eol;
+print $client $content;
+
+if($svg eq "-"){
+	*SVG = *STDOUT;
+}else{
+	open SVG, ">$svg";
+}
+my $status = <$client>;
+die $status unless $status eq "HTTP/1.1 200 OK$eol";
+
+my $body_started = 0;
+while(<$client>){
+	unless($body_started){
+		if($_ eq $eol){
+			$body_started = 1;
+		}elsif(/^Content-Type:/){
+			die "Unexpected content type"
+				if $_ ne "Content-Type: image/svg+xml$eol";
+		}elsif(/^Transfer-Encoding:/){
+			die "Unexpected transfer encoding"
+				if $_ ne "Transfer-Encoding: chunked$eol";
+		}
+	}else{
+		(my $chunk_length = $_) =~ s/$eol$//;
+		$chunk_length = hex($chunk_length);
+		while($chunk_length > 0){
+			$chunk_length -= read $client, my $chunk, $chunk_length;
+			print SVG $chunk;
+		}
+	}
+}
+close SVG unless $svg eq "-";
