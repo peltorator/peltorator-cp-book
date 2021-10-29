@@ -1,5 +1,5 @@
 %s/\\chapter{\(.*\)}\(.*\) \\label{\(.*\)}/\\chapter{\1}/g
-%s/\\chapter{\(.*\)}/---\rtitle: "\1"\rdate: IAMASTRINGOFDATETIMETOBEREPLACED\rdraft: false\r---/g
+%s/\\chapter{\(.*\)}/---\rtitle: "\1"\rdate: IAMASTRINGOFDATETIMETOBEREPLACED\rdraft: false\r---\r\r<center> <h2>\1<\/h2> <\/center>\r<br\/>\r<br\/>\r/g
 %s/IAMASTRINGOFDATETIMETOBEREPLACED/\=strftime("%Y-%m-%dT%H:%M:%S+03:00")/g
 %s/\\O(/O(/g
 %s/\~---/ —/g
