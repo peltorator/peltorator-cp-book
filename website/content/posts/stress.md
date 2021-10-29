@@ -4,6 +4,11 @@ date: 2021-09-14T13:38:44+03:00
 draft: false
 ---
 
+<center> <h2>Стресс-тестирование</h2> </center>
+<br/>
+<br/>
+
+
 ## Общие концепции
 
 Стресс-тестирование — это не тестирование задачи в последние минуты контеста под большим давлением.
@@ -136,8 +141,8 @@ g++ -std=c++17 -O2 gen.cpp -o gen
 for t in $(seq 1 100000); do
     echo "Running test $t"
     ./gen $t > input || { echo "gen failed"; exit; }
-    ./smart < input > smart_output || { echo "smart failed"; exit }
-    ./stupid < input > stupid_output || { echo "stupid failed"; exit }
+    ./smart < input > smart_output || { echo "smart failed"; exit; }
+    ./stupid < input > stupid_output || { echo "stupid failed"; exit; }
     diff smart_output stupid_output || { echo "outputs aren't equal"; exit; }
 done
 ```
