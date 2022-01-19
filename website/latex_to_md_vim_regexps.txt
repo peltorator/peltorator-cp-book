@@ -33,6 +33,8 @@
 %s/\\begin{lemma}/**Лемма:**/g
 %s/\\begin{proof}/**Доказательство:**/g
 %s/\\begin{designation}/**Обозначение:**/g
+%s/\\begin{proposition}/**Предложение:**/g
+%s/\\begin{corollary}/**Следствие:**/g
 %s/\\begin{itemize}//g
 %s/\\begin{code}/```cpp/g
 %s/,>=triangle 45//g
